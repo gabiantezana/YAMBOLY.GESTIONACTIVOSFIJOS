@@ -1,0 +1,5 @@
+--SQL
+/*SELECT * FROM [@MSS_VEHI] WHERE Code = 'param1' */
+
+--HANA
+SELECT * FROM "@MSS_CONF"

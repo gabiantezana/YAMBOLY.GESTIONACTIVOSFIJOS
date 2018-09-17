@@ -1,0 +1,1 @@
+﻿DELETE FROM "@MSS_DESP_LINES" where IFNULL("U_MSS_DOCE", 0)= 0 AND "DocEntry" = 'param1'
