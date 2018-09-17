@@ -2,7 +2,7 @@
 using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_APROForm;
 using System;
 using System.Windows.Forms;
-namespace SAPADDON
+namespace YAMBOLY.GESTIONACTIVOSFIJOS
 {
     internal static class Program
     {
