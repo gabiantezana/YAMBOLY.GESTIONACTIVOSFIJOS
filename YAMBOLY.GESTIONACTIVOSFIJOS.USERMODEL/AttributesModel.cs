@@ -68,6 +68,9 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public Boolean IsSystemField { get; set; } = false;
         public Boolean IsPrimaryKey { get; set; } = false;
 
+        public string FormattedSearchName { get; set; }
+        public string FormattedSearchCategory { get; set; }
+
     }
 
     internal class SAPUDOAttribute : Attribute
@@ -90,6 +93,29 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
 
         public Type HeaderTableType { get; set; }
         public Type[] ChildTableTypeList { get; set; } = new Type[] { };
+    }
+
+    internal class FormattedSearchListAttribute : Attribute { }
+    internal class MenuListAttribute : Attribute { }
+
+    internal class FormattedSearchAttribute : Attribute
+    {
+        public string query { get; set; }
+        public string queryName { get; set; }
+        public string categoryName { get; set; }
+    }
+
+    internal class MenuItemAttribute : Attribute
+    {
+        public string menuUID { get; set; }
+        public string menuTitle { get; set; }
+        
+    }
+
+    public class FormNameAndFields
+    {
+        public string FormName { get; set; }
+        public string[] FieldNames { get; set; }
     }
 
     internal static class AttributeExtensions

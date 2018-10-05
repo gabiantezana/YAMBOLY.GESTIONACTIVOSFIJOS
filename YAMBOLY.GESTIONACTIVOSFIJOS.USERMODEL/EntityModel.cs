@@ -31,6 +31,13 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public String DefaultValue { get; set; } = String.Empty;
         public String VinculatedTable { get; set; } = String.Empty;
         public Boolean IsSearchField { get; set; } = false;
+
+        #region Búsquedas formateadas para formularios
+
+        public string FormattedSearchName { get; set; }
+        public string FormattedSearchCategory { get; set; }
+
+        #endregion
     }
 
     public class SAPUDOEntity
@@ -58,5 +65,37 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public String[] ChildFormColumns { get; set; } = new String[] { };
 
         public String[] ChildTableNameList { get; set; }
+    }
+
+    public class SAPFormattedSearchEntity
+    {
+        public string query { get; set; }
+        public string queryName { get; set; }
+        public string queryCategory { get; set; }
+        public string formId { get; set; }
+        public string fieldId { get; set; }
+    }
+    public class MenuEntity
+    {
+        public string menuUid { get; set; }
+        public string menuTitle { get; set; }
+        public List<MenuEntity> submmenuList { get; set; } = new List<MenuEntity>();
+        public MenuType menuType { get; set; }
+        public SubMenuType subMenuType { get; set; }
+        public string parentMenuId { get; set; }
+        public int FolderLevel { get; set; }
+    }
+    
+    public enum MenuType
+    {
+        MenuPrincipal = 1,
+        SubMenu = 2,
+    }
+
+    //DontchangeIds
+    public enum SubMenuType
+    {
+        String = 1,//DONT CHANGE ID
+        Folder = 2,//DONT CHANGE ID
     }
 }

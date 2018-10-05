@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using SAPbouiCOM;
 
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.DATAACCESS
 {
@@ -94,22 +95,16 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.DATAACCESS
             return SapResponse;
         }
 
-        public void ClearLatestVersionsInDBSchema()
-        {
-
-        }
-
         public void GenerateDBSchema()
-        {
-            CreateSchema();
-        }
-
-        public void CreateSchema()
         {
             DBSchema dBSchema = new UserModel().GetDBSchema();
             dBSchema.TableList.ForEach(x => SapMethodsHelper.CreateTable(GetCompany(), x));
             dBSchema.FieldList.ForEach(x => SapMethodsHelper.CreateField(GetCompany(), x));
             dBSchema.UDOList.ForEach(x => SapMethodsHelper.CreateUDO(GetCompany(), x));
+            dBSchema.FormattedSearchList.ForEach(x => SapMethodsHelper.CreateFMSMD(GetCompany(), x.queryName, x.query, x.formId, x.fieldId, x.queryCategory));
+            dBSchema.MenuList.Where(x => x.menuType == MenuType.MenuPrincipal).ToList().ForEach(x => SapMethodsHelper.CreatePrincipalMenul(GetApplication(), x.menuUid, x.menuTitle));
+            dBSchema.MenuList.Where(x => x.menuType == MenuType.SubMenu && x.subMenuType == SubMenuType.Folder).OrderByDescending(x=> x.FolderLevel).ToList().ForEach(x => SapMethodsHelper.CreateSubMenu(GetApplication(), x.parentMenuId, x.menuUid, x.menuTitle, (BoMenuType)x.subMenuType));
+            dBSchema.MenuList.Where(x => x.menuType == MenuType.SubMenu && x.subMenuType == SubMenuType.String).ToList().ForEach(x => SapMethodsHelper.CreateSubMenu(GetApplication(), x.parentMenuId, x.menuUid, x.menuTitle, (BoMenuType)x.subMenuType));
         }
 
         #region Queries 

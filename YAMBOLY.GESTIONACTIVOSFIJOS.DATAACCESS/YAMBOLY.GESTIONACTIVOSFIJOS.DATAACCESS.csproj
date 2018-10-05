@@ -92,70 +92,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Queries\RDR1_GetList.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_VEHIC_GetItem.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\RDR1_GetItem.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\TESTING.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_APRO_GetList.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_DESP_ApproveItem.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_DESP_GetItem.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_DESP_GetDetail.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_ASUA_UDO_GetList.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_ASUU_UDO_GetList.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_ASUA_UDO_GetListByUser.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_DESP_GetLastDocumentCreated.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\ORDR_GetItem.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_DESP_UpdateItem.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_DESP_GetRoutes.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_CONF_GetItem.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\ORDR_UpdateAfterApproveDesp.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\OHEM_GetItem.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_DESP_GetItemOnHandQuantity.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\OITM_GetItem.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_DESP_LINES_RemoveNull.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Queries\MSS_DESP_UpdateItem2.sql" />
+    <EmbeddedResource Include="Queries\MSS_LISTAR_SERIES_ENTREGA.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

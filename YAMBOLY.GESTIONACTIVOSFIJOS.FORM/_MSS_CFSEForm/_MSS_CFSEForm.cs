@@ -2,18 +2,20 @@
 using SAPbouiCOM;
 using System;
 using System.Collections.Generic;
+using static YAMBOLY.GESTIONACTIVOSFIJOS.HELPER.ConstantHelper;
 
-namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_VEHICForm
+namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CFSEForm
 {
-    class MSS_CONFForm : BaseApplication, ISAPForm
+    class MSS_CFSEForm : BaseApplication, ISAPForm
     {
+        public const string FormType = nameof(MSS_CFSEForm);
         private Form _Form { get; set; }
         public Form GetForm() => _Form;
         public static string GetFormName() => "Configuración";
 
-        public MSS_CONFForm(Dictionary<string, ISAPForm> dictionary)
+        public MSS_CFSEForm(Dictionary<string, ISAPForm> dictionary)
         {
-            _Form = SapFormHelper.CreateForm(GetApplication(), XMLHelper.GetXMLString(System.Reflection.Assembly.GetExecutingAssembly(), EmbebbedFileName.MSS_CONFForm), FormID.MSS_CONF.IdToString());
+            _Form = SapFormHelper.CreateForm(GetApplication(), XMLHelper.GetXMLString(System.Reflection.Assembly.GetExecutingAssembly(), nameof(MSS_CFSEForm)), FormType);
             if (_Form != null)
             {
                 dictionary.Add(_Form.UniqueID, this);
@@ -35,12 +37,12 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_VEHICForm
 
         private void SetMenuButtons()
         {
-            _Form.EnableMenu(MenuUID.MenuCrear.IdToString(), false);
-            _Form.EnableMenu(MenuUID.MenuBuscar.IdToString(), false);
-            _Form.EnableMenu(MenuUID.RegistroDatosPrimero.IdToString(), false);
-            _Form.EnableMenu(MenuUID.RegistroDatosUltimo.IdToString(), false);
-            _Form.EnableMenu(MenuUID.RegistroDatosSiguiente.IdToString(), false);
-            _Form.EnableMenu(MenuUID.RegistroDatosAnterior.IdToString(), false);
+            _Form.EnableMenu(MenuUID.MenuCrear, false);
+            _Form.EnableMenu(MenuUID.MenuBuscar, false);
+            _Form.EnableMenu(MenuUID.RegistroDatosPrimero, false);
+            _Form.EnableMenu(MenuUID.RegistroDatosUltimo, false);
+            _Form.EnableMenu(MenuUID.RegistroDatosSiguiente, false);
+            _Form.EnableMenu(MenuUID.RegistroDatosAnterior, false);
         }
 
         public bool HandleItemEvents(SAPbouiCOM.ItemEvent itemEvent)
@@ -53,7 +55,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_VEHICForm
                     LoadLastRecord();
             }
 
-      
+
             return true;
         }
 
@@ -80,9 +82,9 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_VEHICForm
         public void LoadLastRecord()
         {
             //Ve al último registro
-            _Form.EnableMenu(MenuUID.RegistroDatosUltimo.IdToString(), true);
-            GetApplication().ActivateMenuItem(MenuUID.RegistroDatosUltimo.IdToString());
-            _Form.EnableMenu(MenuUID.RegistroDatosUltimo.IdToString(), false);
+            _Form.EnableMenu(MenuUID.RegistroDatosUltimo, true);
+            GetApplication().ActivateMenuItem(MenuUID.RegistroDatosUltimo);
+            _Form.EnableMenu(MenuUID.RegistroDatosUltimo, false);
 
             //Modo update
             GetForm().Mode = BoFormMode.fm_UPDATE_MODE;

@@ -5,19 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONF
+namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFPE
 {
     [DBStructure]
-    [SAPUDO(Name = "CONFIGURACION",
-           HeaderTableType = typeof(MSS_CONF),
+    [SAPUDO(Name = "AF- Conf. Permisos",
+           HeaderTableType = typeof(MSS_CFPE),
            CanCreateDefaultForm = BoYesNoEnum.tNO,
-           CanFind = BoYesNoEnum.tNO,
+           CanFind = BoYesNoEnum.tYES,
            EnableEnhancedForm = BoYesNoEnum.tYES,
            RebuildEnhancedForm = BoYesNoEnum.tYES,
            ObjectType = SAPbobsCOM.BoUDOObjType.boud_MasterData
    )]
-    public class MSS_CONF_UDO
+    public class MSS_CFPE_UDO
     {
-
     }
 }

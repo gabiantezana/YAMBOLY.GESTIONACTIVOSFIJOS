@@ -37,5 +37,18 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
             }
         }
 
+        public static string GetXMLString(Assembly assembly, string resourceName)
+        {
+            var resourceFullName = assembly.GetManifestResourceNames().ToList().FirstOrDefault(x => x.Contains(resourceName));
+            if (string.IsNullOrEmpty(resourceFullName))
+                throw new Exception("ResourceName not found: " + resourceName);
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceFullName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
     }
 }

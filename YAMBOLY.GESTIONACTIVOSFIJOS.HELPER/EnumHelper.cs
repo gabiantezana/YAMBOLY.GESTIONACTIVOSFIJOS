@@ -85,7 +85,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
         MSS_ASUU = -107,
     }
 
-    public enum MenuUID
+    public enum _MenuUID
     {
         _150Form = 3073,
         MenuBuscar = 1281,

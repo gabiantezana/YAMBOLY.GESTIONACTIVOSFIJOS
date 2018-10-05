@@ -1,20 +1,17 @@
 ﻿using YAMBOLY.GESTIONACTIVOSFIJOS.DATAACCESS;
 using YAMBOLY.GESTIONACTIVOSFIJOS.EXCEPTION;
-using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_APROForm;
-using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_VEHICForm;
+//using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_APROForm;
+//using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_VEHICForm;
 using SAPbouiCOM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_ASUAForm;
-using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_ASUUForm;
-using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_DESPForm;
+//using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_ASUAForm;
+//using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_ASUUForm;
+//using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_DESPForm;
 using YAMBOLY.GESTIONACTIVOSFIJOS.HELPER;
 using static YAMBOLY.GESTIONACTIVOSFIJOS.HELPER.ConstantHelper;
 using System.Threading;
-using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_ASUU;
-using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_ASUA;
-using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONF;
 
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 { 
@@ -37,7 +34,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 
                 SetApplicationEventFilters();
                 SetApplicationEvents();
-                CreateAddonMenu();
+                //CreateAddonMenu();
                 ShowMessage(MessageType.Success, "El Addon se cargó exitosamente");
             }
             catch (Exception ex)
@@ -55,10 +52,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 
         public void CreateDataBaseStructure(SAPbobsCOM.Company company)
         {
-
             new BaseDataAccess().GenerateDBSchema();
         }
-
 
         #region Helper
 
@@ -139,15 +134,6 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
         public static int ShowAlert(string message)
         {
             return GetApplication().MessageBox(message);
-        }
-
-
-        public void amenosb()
-        {
-            var list1 = new List<int>() { 1, 2, 3, 4 };
-            var list2 = new List<int>() { 5, 6, 7, 2 };
-
-            var result = list1.Where(p => list2.Any(p2 => p2 == p));
         }
 
         #endregion
@@ -260,6 +246,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 
         private void MenuEvent(ref SAPbouiCOM.MenuEvent menuEvent, out bool BubbleEvent)
         {
+            BubbleEvent = true;
+            /*
             try
             {
                 if (!menuEvent.BeforeAction)
@@ -303,6 +291,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
                 BubbleEvent = true;
                 GC.Collect();
             }
+            */
         }
 
         private void ItemEvent(string formUID, ref ItemEvent itemEvent, out bool BubbleEvent)
@@ -372,104 +361,6 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 
         #endregion
 
-        #region AddonMenu
-
-        private void CreateAddonMenu()
-        {
-
-            var uniqueMenuId = ((int)MenuUID.AddonGestionDespachosMenu).ToString();
-            var menuTitle = "Gestión de despachos";
-            var itemId = "43520";
-
-            SAPbouiCOM.MenuCreationParams oCreationPackage = ((SAPbouiCOM.MenuCreationParams)(GetApplication().CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_MenuCreationParams)));
-            SAPbouiCOM.Menus oMenus = GetApplication().Menus;
-            SAPbouiCOM.MenuItem oMenuItem = GetApplication().Menus.Item(itemId);
-
-            if (!GetApplication().Menus.Exists(uniqueMenuId))
-            {
-                oMenus = oMenuItem.SubMenus;
-                oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_POPUP;
-                oCreationPackage.UniqueID = uniqueMenuId;
-                oCreationPackage.String = menuTitle;
-                oCreationPackage.Enabled = true;
-                oCreationPackage.Position = 15;
-
-                //Agrega el nuevo menú al listado principal.
-                oMenus.AddEx(oCreationPackage);
-            }
-
-            //Obtiene el menú principal
-            oMenuItem = GetApplication().Menus.Item(uniqueMenuId);
-
-            //Instancia submenus del nuevo menú
-            oMenus = oMenuItem.SubMenus;
-            foreach (var item in GetSubMenuList())
-            {
-                if (!oMenuItem.SubMenus.Exists(item.UniqueId))
-                {
-                    //Crea un nuevo submenú
-                    oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
-                    oCreationPackage.UniqueID = item.UniqueId;
-                    oCreationPackage.String = item.Title;
-                    //oCreationPackage.Image = sPath + "routesheet.bmp";
-                    //Agrega el nuevo submenú
-                    oMenus.AddEx(oCreationPackage);
-                }
-            }
-        }
-
-        private List<HELPER.SubMenuItem> GetSubMenuList()
-        {
-            var list = new List<SubMenuItem>();
-
-            list.Add(new SubMenuItem()
-            {
-                UniqueId = MenuUID.MaestroVehiculosSubMenu.IdToString(),
-                Title = "Maestro de vehículos"
-            });
-
-            list.Add(new SubMenuItem()
-            {
-                UniqueId = MenuUID.AutorizacionusuarioAlmacenSubMenu.IdToString(),
-                Title = "Asignación almacén-usuario"
-            });
-
-            list.Add(new SubMenuItem()
-            {
-                UniqueId = MenuUID.DefinicionUsuarioAprobadorSubMenu.IdToString(),
-                Title = "Asignación de usuarios aprobadores"
-            });
-
-            list.Add(new SubMenuItem()
-            {
-                UniqueId = MenuUID.DespachoVehiculosSubMenu.IdToString(),
-                Title = "Planificador de despachos"
-            });
-
-            list.Add(new SubMenuItem()
-            {
-                UniqueId = MenuUID.AprobacionDespachoVehiculosSubMenu.IdToString(),
-                Title = "Aprobación de despachos"
-            });
-
-            list.Add(new SubMenuItem()
-            {
-                UniqueId = MenuUID.AprobacionDespachoVehiculosSubMenu.IdToString(),
-                Title = "Aprobación de despachos"
-            });
-
-            list.Add(new SubMenuItem()
-            {
-                UniqueId = MenuUID.ConfiguracionAddonSubMenu.IdToString(),
-                Title = "Configuración"
-            });
-
-            return list;
-        }
-
-
-        #endregion
-
         #region Handle Exceptions
 
         public static dynamic HandleApplicationException(Exception ex, string message = null)
@@ -507,6 +398,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 
         private static void CreateAuthorizations()
         {
+            /*  
             SAPbobsCOM.UserPermissionTree permission = GetCompany().GetBusinessObject(SAPbobsCOM.BoObjectTypes.oUserPermissionTree);
             if (!permission.GetByKey(PARENTPERMISSIONKEY))
             {
@@ -546,6 +438,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
                 permission.UserPermissionForms.FormType = FormID.MSS_CONF.IdToString();
                 permission.Add();
             }
+            */
         }
 
         #endregion
