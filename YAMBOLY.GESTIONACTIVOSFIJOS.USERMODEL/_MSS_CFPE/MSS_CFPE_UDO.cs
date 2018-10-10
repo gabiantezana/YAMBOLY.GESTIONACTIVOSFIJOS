@@ -14,7 +14,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFPE
            CanFind = BoYesNoEnum.tYES,
            EnableEnhancedForm = BoYesNoEnum.tYES,
            RebuildEnhancedForm = BoYesNoEnum.tYES,
-           ObjectType = SAPbobsCOM.BoUDOObjType.boud_MasterData
+           ObjectType = SAPbobsCOM.BoUDOObjType.boud_Document
    )]
     public class MSS_CFPE_UDO
     {

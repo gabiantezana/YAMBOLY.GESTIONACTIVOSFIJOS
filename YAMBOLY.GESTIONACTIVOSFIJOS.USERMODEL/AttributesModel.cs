@@ -70,7 +70,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
 
         public string FormattedSearchName { get; set; }
         public string FormattedSearchCategory { get; set; }
-
+        public Type FormattedSearchType { get; set; }
     }
 
     internal class SAPUDOAttribute : Attribute
@@ -95,27 +95,32 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public Type[] ChildTableTypeList { get; set; } = new Type[] { };
     }
 
-    internal class FormattedSearchListAttribute : Attribute { }
+    /// <summary>
+    /// Atributo para la clase que contendrá los menús. Una clase dentro de otra indica un subnivel de menú. Cada subnivel de clase debe tener el attributo MenuItemAttribute
+    /// </summary>
     internal class MenuListAttribute : Attribute { }
 
-    internal class FormattedSearchAttribute : Attribute
-    {
-        public string query { get; set; }
-        public string queryName { get; set; }
-        public string categoryName { get; set; }
-    }
-
+    /// <summary>
+    /// Atributo para generar un menú.
+    /// </summary>
     internal class MenuItemAttribute : Attribute
     {
-        public string menuUID { get; set; }
-        public string menuTitle { get; set; }
-        
+        public string MenuUID { get; set; }
+        public string MenuTitle { get; set; }
     }
 
-    public class FormNameAndFields
+    /// <summary>
+    /// Atributo para la clase que contiene los queries
+    /// </summary>
+    internal class QueryListAttribute : Attribute { }
+    /// <summary>
+    /// Atributo para generar queries, toma el nombre de la clase como nombre del query. Este atributo solo se puede asignar a una clase
+    /// </summary>
+    internal class QueryAttribute : Attribute
     {
-        public string FormName { get; set; }
-        public string[] FieldNames { get; set; }
+        public string Query { get; set; }
+        public string QueryName { get; set; }
+        public string CategoryName { get; set; }
     }
 
     internal static class AttributeExtensions

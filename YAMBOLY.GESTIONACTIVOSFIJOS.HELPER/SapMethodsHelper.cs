@@ -447,6 +447,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
             }
         }
 
+        [Obsolete]//TODO:
         public static bool CreateFMSMD(Company oCompany, string queryName, string query, string formID, string itemID, string queryCategoryFMS,
                                 string columnID = "-1", bool autoRefresh = false, bool forceRefresh = false,
                                 string autoRefreshField = "", bool removeIfExists = false)
@@ -493,7 +494,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
 
                         result = oFormattedSearches.Add();
                         if (result != 0)
-                            return false;
+                            throw new SapException();
                     }
                 }
                 else { return false; }

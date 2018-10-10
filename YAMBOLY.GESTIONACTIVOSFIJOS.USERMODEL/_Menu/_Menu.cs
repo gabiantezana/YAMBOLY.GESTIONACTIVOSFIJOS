@@ -2,34 +2,26 @@
 
 namespace SAPADDON.USERMODEL._Menu
 {
-    /// <summary>
-    /// Esta capa se usa para crear automáticamente los menús. Una clase dentro de otra indica un subnivel de menú.
-    /// </summary>
+  
     [MenuList]
     public static class _Menu
     {
-        [MenuItem(menuTitle = "AddOn Gestión de activos fijos")]
+        [MenuItem(MenuTitle = "AddOn Gestión de activos fijos")]
         public static class MENU_PRINCIPAL
         {
-            [MenuItem(menuTitle = "Configuración y permisos")]
+            [MenuItem(MenuTitle = "Configuración y permisos")]
             public static class MENU_CONFIGURACION
             {
-                [MenuItem(menuTitle = "Configuración de series")]
-                public const string MENU_CONFIGURACIONSERIES = null;
+                [MenuItem(MenuTitle = "Configuración de series")]
+                public const string MENU_CONFIGURACIONSERIES = "MENU_CONFIGURACIONSERIES";
 
-                [MenuItem(menuTitle = "Configuración de permisos")]
-                public const string MENU_CONFIGURACIONPERMISOS = null;
-                
-                [MenuItem(menuTitle = "Maestros")]
-                public static class MENU_MAESTROS
-                {
-                    [MenuItem(menuTitle = "Maestro prueba 1")]
-                    public const string MENU_MAESTROPRUEBA1 = null;
-                }
+                [MenuItem(MenuTitle = "Configuración de permisos")]
+                public const string MENU_CONFIGURACIONPERMISOS = "MENU_CONFIGURACIONPERMISOS";
+             
             }
 
-            [MenuItem(menuTitle = "Menu prueba maestro principal")]
-            public const string MENU_MAESTROPRUEBAMENU = null;
+            [MenuItem(MenuTitle = "Maestro 1")]
+            public const string MENU_MAESTROPRUEBAMENU = "MENU_MAESTROPRUEBAMENU";
         }
     }
 }

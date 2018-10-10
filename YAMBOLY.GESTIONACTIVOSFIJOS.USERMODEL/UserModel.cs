@@ -18,28 +18,23 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
                 if (!String.IsNullOrEmpty(containingFolderName))
                     formattedSearchesListTypes.Where(x => string.Equals(x.Namespace, containingFolderName, StringComparison.Ordinal));
 
-                //Por cada clase que tenga el atributo lista de menús
                 foreach (Type type in formattedSearchesListTypes)
                 {
-                    //LEE LAS CLASES DENTRO DE LA CLASE CON 
                     foreach (var item in type.GetNestedTypes())
                     {
-                        var menuList = GetMenuList(item);
-                        menuList.menuType = MenuType.MenuPrincipal;
+                        var menuList = GetMenuItem(item);
+                        menuList.MenuType = MenuType.MenuPrincipal;
                         _Schema.MenuList.Add(menuList);
                     }
 
                     foreach (var item in type.GetProperties())
                     {
-                        _Schema.MenuList.Add(GetMenuList(item));
+                        _Schema.MenuList.Add(GetMenuItem(item));
                     }
 
                     foreach (var p in type.GetFields(BindingFlags.Public | BindingFlags.Static))
                     {
-                        GetMenuList(p);
-                        var v = p.GetValue(null); // static classes cannot be instanced, so use null...
-                                                  //do something with v
-                        Console.WriteLine(v.ToString());
+                        GetMenuItem(p);
                     }
                 }
             }
@@ -54,7 +49,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         /// 
         /// </summary>
         /// <param name="type">Puede ser de tipo atributo o de tipo clase</param>
-        private MenuEntity GetMenuList(MemberInfo memberInfo)
+        private MenuEntity GetMenuItem(MemberInfo memberInfo)
         {
             MenuEntity entity = new MenuEntity();
             if (Attribute.IsDefined(memberInfo, typeof(MenuItemAttribute)))
@@ -62,8 +57,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
                 MenuItemAttribute attribute = (MenuItemAttribute)Attribute.GetCustomAttribute(memberInfo, typeof(MenuItemAttribute), false);
                 entity = new MenuEntity()
                 {
-                    menuTitle = attribute.menuTitle,
-                    menuUid = memberInfo.Name,
+                    MenuTitle = attribute.MenuTitle,
+                    MenuUid = memberInfo.Name,
                 };
                 var definedClassType = memberInfo as Type;
                 if (definedClassType?.IsClass == true)
@@ -71,28 +66,31 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
                     var currentClass = ((Type)memberInfo).UnderlyingSystemType;
                     foreach (var item in currentClass.GetNestedTypes())
                     {
-                        var child = GetMenuList(item);
-                        child.parentMenuId = entity.menuUid;
-                        child.menuType = MenuType.SubMenu;
-                        child.subMenuType = SubMenuType.Folder;
+                        var child = GetMenuItem(item);
+                        child.ParentMenuId = entity.MenuUid;
+                        child.MenuType = MenuType.SubMenu;
+                        child.SubMenuType = SubMenuType.Folder;
                         child.FolderLevel = folderLevel;
-                        _Schema.MenuList.Add(child);
-                        folderLevel++;
-                        //entity.submmenuList.Add(child);
+                        if (!string.IsNullOrEmpty(child.MenuTitle) && !string.IsNullOrEmpty(child.MenuUid))
+                        {
+                            _Schema.MenuList.Add(child);
+                            folderLevel++;
+                        }
                     }
-                    //Se extraen los menús simples
                     foreach (var p in currentClass.GetFields(BindingFlags.Public | BindingFlags.Static))
                     {
-                        var child = GetMenuList(p);
-                        child.parentMenuId = entity.menuUid;
-                        child.menuType = MenuType.SubMenu;
-                        child.subMenuType = SubMenuType.String;
-                        _Schema.MenuList.Add(child);
-                        //entity.submmenuList.Add(child);
+                        var child = GetMenuItem(p);
+                        child.ParentMenuId = entity.MenuUid;
+                        child.MenuType = MenuType.SubMenu;
+                        child.SubMenuType = SubMenuType.String;
+                        if (!string.IsNullOrEmpty(child.MenuTitle) && !string.IsNullOrEmpty(child.MenuUid))
+                        {
+                            _Schema.MenuList.Add(child);
+                        }
                     }
                 }
             }
-            entity.menuType = MenuType.SubMenu;
+            entity.MenuType = MenuType.SubMenu;
             return entity;
         }
 
@@ -100,7 +98,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         {
             try
             {
-                IEnumerable<Type> formattedSearchesListTypes = Assembly.GetExecutingAssembly().GetTypes().Where(x => (x.GetAttributeValue((FormattedSearchListAttribute att) => att != null)));
+                IEnumerable<Type> formattedSearchesListTypes = Assembly.GetExecutingAssembly().GetTypes().Where(x => (x.GetAttributeValue((QueryListAttribute att) => att != null)));
                 if (!String.IsNullOrEmpty(containingFolderName))
                     formattedSearchesListTypes.Where(x => string.Equals(x.Namespace, containingFolderName, StringComparison.Ordinal));
 
@@ -108,16 +106,18 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
                 foreach (Type type in formattedSearchesListTypes)
                 {
                     //Por cada ítem de tipo búsqueda formateada dentro de un listado
-                    foreach (var itemType in type.GetProperties())
+                    //foreach (var itemType in type.GetProperties())
+                    foreach (var itemType in type.GetNestedTypes())
                     {
-                        if (Attribute.IsDefined(itemType, typeof(FormattedSearchAttribute)))
+                        if (Attribute.IsDefined(itemType, typeof(QueryAttribute)))
                         {
-                            SAPFormattedSearchEntity entity = new SAPFormattedSearchEntity
+                            SAPQueryEntity entity = new SAPQueryEntity
                             {
-                                query = itemType.GetAttributeValue((FormattedSearchAttribute att) => att.query),
-                                queryName = itemType.GetAttributeValue((FormattedSearchAttribute att) => att.queryName) ?? itemType.Name,
-                                queryCategory = itemType.GetAttributeValue((FormattedSearchAttribute att) => att.categoryName),
+                                Query = itemType.GetAttributeValue((QueryAttribute att) => att.Query),
+                                QueryName = itemType.GetAttributeValue((QueryAttribute att) => att.QueryName) ?? itemType.Name,
+                                QueryCategory = itemType.GetAttributeValue((QueryAttribute att) => att.CategoryName),
                             };
+                            _Schema.FormattedSearchList.Add(entity);
                             /*
                             var fieldsAndFormIds = itemType.GetAttributeValue((FormattedSearchAttribute att) => att.fieldAndFormNames);
                             foreach (var value in fieldsAndFormIds)
@@ -189,40 +189,40 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
             }
         }
 
-        private void DefineSAPUDOs(String containingFolderName = null)
+        private void DefineSAPUDOsAndFormattedSearchFields(String containingFolderName = null)
         {
             try
             {
                 IEnumerable<Type> udoTypes = Assembly.GetExecutingAssembly().GetTypes().Where(x => (x.GetAttributeValue((SAPUDOAttribute att) => att != null)));
-                foreach (Type type in udoTypes)
+                foreach (Type udoType in udoTypes)
                 {
                     SAPUDOEntity udo = new SAPUDOEntity();
-                    udo.Code = type.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType.Name);
-                    udo.Name = type.GetAttributeValue((SAPUDOAttribute att) => att.Name);
-                    udo.HeaderTableName = type.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType.Name);
-                    udo.FindColumns = type.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                    udo.Code = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType.Name);
+                    udo.Name = udoType.GetAttributeValue((SAPUDOAttribute att) => att.Name);
+                    udo.HeaderTableName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType.Name);
+                    udo.FindColumns = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
                                         .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSearchField)).Select(y => y.Name).ToArray();
-                    udo.ChildTableNameList = type.GetAttributeValue((SAPUDOAttribute attr) => attr.ChildTableTypeList).Select(y => y.Name).ToArray();
-                    udo.ObjectType = type.GetAttributeValue((SAPUDOAttribute att) => att.ObjectType);
-                    udo.CanCancel = type.GetAttributeValue((SAPUDOAttribute att) => att.CanCancel);
-                    udo.CanCreateDefaultForm = type.GetAttributeValue((SAPUDOAttribute att) => att.CanCreateDefaultForm);
-                    udo.CanClose = type.GetAttributeValue((SAPUDOAttribute att) => att.CanClose);
-                    udo.CanDelete = type.GetAttributeValue((SAPUDOAttribute att) => att.CanDelete);
-                    udo.CanFind = type.GetAttributeValue((SAPUDOAttribute att) => att.CanFind);
-                    udo.CanLog = type.GetAttributeValue((SAPUDOAttribute att) => att.CanLog);
-                    udo.ChildFormColumns = type.GetAttributeValue((SAPUDOAttribute att) => att.ChildFormColumns);
-                    udo.EnableEnhancedForm = type.GetAttributeValue((SAPUDOAttribute att) => att.EnableEnhancedForm);
-                    udo.FormColumnsName = type.GetAttributeValue((SAPUDOAttribute att) => att.FormColumns);
+                    udo.ChildTableNameList = udoType.GetAttributeValue((SAPUDOAttribute attr) => attr.ChildTableTypeList).Select(y => y.Name).ToArray();
+                    udo.ObjectType = udoType.GetAttributeValue((SAPUDOAttribute att) => att.ObjectType);
+                    udo.CanCancel = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanCancel);
+                    udo.CanCreateDefaultForm = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanCreateDefaultForm);
+                    udo.CanClose = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanClose);
+                    udo.CanDelete = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanDelete);
+                    udo.CanFind = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanFind);
+                    udo.CanLog = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanLog);
+                    udo.ChildFormColumns = udoType.GetAttributeValue((SAPUDOAttribute att) => att.ChildFormColumns);
+                    udo.EnableEnhancedForm = udoType.GetAttributeValue((SAPUDOAttribute att) => att.EnableEnhancedForm);
+                    udo.FormColumnsName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.FormColumns);
 
                     if (udo.CanCreateDefaultForm == BoYesNoEnum.tYES)
                     {
-                        var userFieldsName = type.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                        var userFieldsName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
                             .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ShowFieldInDefaultForm && attr2.IsSystemField == false)).Select(y => "U_" + y.Name).ToArray();
 
-                        var defaultFields = type.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                        var defaultFields = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
                             .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ShowFieldInDefaultForm && attr2.IsSystemField)).Select(y => y.Name).ToArray();
 
-                        var userFieldsDescription = type.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                        var userFieldsDescription = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
                             .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ShowFieldInDefaultForm)).Select(y => y.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FieldDescription)).ToArray();
 
                         udo.FormColumnsName = defaultFields.Concat(userFieldsName).ToArray();
@@ -231,18 +231,36 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
 
                     if (udo.CanFind == BoYesNoEnum.tYES)
                     {
-                        var userFieldsName = type.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                        var userFieldsName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
                             .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSearchField && attr2.IsSystemField == false)).Select(y => "U_" + y.Name).ToArray();
 
-                        var defaultFields = type.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                        var defaultFields = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
                             .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSearchField && attr2.IsSystemField)).Select(y => y.Name).ToArray();
 
                         udo.FindColumns = defaultFields.Concat(userFieldsName).ToArray();
                     }
 
-                    udo.ManageSeries = type.GetAttributeValue((SAPUDOAttribute att) => att.ManageSeries);
-                    udo.RebuildEnhancedForm = type.GetAttributeValue((SAPUDOAttribute att) => att.RebuildEnhancedForm);
+                    udo.ManageSeries = udoType.GetAttributeValue((SAPUDOAttribute att) => att.ManageSeries);
+                    udo.RebuildEnhancedForm = udoType.GetAttributeValue((SAPUDOAttribute att) => att.RebuildEnhancedForm);
                     _Schema.UDOList.Add(udo);
+
+                    //----------------------------------------------------DEFINE CAMPOS ASOCIADOS A BÚSQUEDAS FORMATEADAS------------------------------------------------------
+                    var list = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                                        .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType != null)).Select(y => y).ToArray();
+
+                    foreach (var item in list)
+                    {
+                        var formattedSearchType = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType);
+                        _Schema.FormattedSearchFieldList.Add(new SAPFormattedSearchEntity()
+                        {
+                            FieldId = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSystemField) ? item.Name : "U_" + item.Name,
+                            FormId = udo.Code,
+                            QueryCategory = formattedSearchType.GetAttributeValue((QueryAttribute x) => x.CategoryName),
+                            QueryName = formattedSearchType.Name
+                        });
+                    };
+                    //----------------------------------------------------DEFINE CAMPOS ASOCIADOS A BÚSQUEDAS FORMATEADAS------------------------------------------------------
+
                 }
             }
             catch (Exception ex)
@@ -255,8 +273,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public DBSchema GetDBSchema()
         {
             DefineSAPTablesAndFields();
-            DefineSAPUDOs();
             DefineFormattedSearchs();
+            DefineSAPUDOsAndFormattedSearchFields();
             DefineMenuItems();
             return _Schema;
         }
@@ -265,7 +283,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public DBSchema GetDBSchema(String containerFolderName)
         {
             DefineSAPTablesAndFields(containerFolderName);
-            DefineSAPUDOs(containerFolderName);
+            DefineSAPUDOsAndFormattedSearchFields(containerFolderName);
             DefineFormattedSearchs();
             return _Schema;
         }
@@ -276,8 +294,9 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public List<SAPTableEntity> TableList { get; set; } = new List<SAPTableEntity>();
         public List<SAPFieldEntity> FieldList { get; set; } = new List<SAPFieldEntity>();
         public List<SAPUDOEntity> UDOList { get; set; } = new List<SAPUDOEntity>();
-        public List<SAPFormattedSearchEntity> FormattedSearchList { get; set; } = new List<SAPFormattedSearchEntity>();
+        public List<SAPQueryEntity> FormattedSearchList { get; set; } = new List<SAPQueryEntity>();
         public List<MenuEntity> MenuList { get; set; } = new List<MenuEntity>();
+        public List<SAPFormattedSearchEntity> FormattedSearchFieldList { get; set; } = new List<SAPFormattedSearchEntity>();
     }
 
 }

@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="BaseApplication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="_MSS_CFPEForm\_MSS_CFPEForm.cs" />
     <Compile Include="_MSS_CFSEForm\_MSS_CFSEForm.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -97,7 +98,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="_MSS_CFSEForm\MSS_CFSEForm.srf" />
+    <EmbeddedResource Include="_MSS_CFSEForm\MSS_CFSEForm.srf" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_MSS_CFPEForm\MSS_CFPEForm.srf" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -8,19 +8,24 @@ using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFSE;
 
 namespace SAPADDON.USERMODEL._FormattedSearches
 {
-    public class _FormattedSearches
+    public class FormattedSearches
     {
-        [FormattedSearchList]
-        public class _FormattedSearch
+        public const string MSS_GESTIONACTIVOSFIJOS = "MSS_GESTIONACTIVOSFIJOS";
+        
+        [QueryList]
+        public class FormattedSearch
         {
-            [FormattedSearch(categoryName = nameof(YAMBOLY.GESTIONACTIVOSFIJOS), query = @"SELECT ""AcctCode"", ""AcctCode"" || ' - ' || ""AcctName"" FROM ""OACT""")]
-            public static string FS_MSS_LISTAR_SERIES_ENTREGA { get; set; }
+            [Query(CategoryName = MSS_GESTIONACTIVOSFIJOS, Query = @"SELECT ""AcctCode"", ""AcctCode"" || ' - ' || ""AcctName"" FROM ""OACT""")]
+            public static class FS_MSS_LISTAR_SERIES_ENTREGA { }
 
-            [FormattedSearch(categoryName = nameof(YAMBOLY.GESTIONACTIVOSFIJOS), query = @"SELECT ""AcctCode"", ""AcctCode"" || ' - ' || ""AcctName"" FROM ""OACT""")]
-            public static string FS_MSS_LISTAR_SERIES_DEVOLUCION { get; set; }
+            [Query(CategoryName = MSS_GESTIONACTIVOSFIJOS, Query = @"SELECT ""AcctCode"", ""AcctCode"" || ' - ' || ""AcctName"" FROM ""OACT""")]
+            public static class FS_MSS_LISTAR_SERIES_DEVOLUCION { }
 
-            [FormattedSearch(categoryName = nameof(YAMBOLY.GESTIONACTIVOSFIJOS), query = @"SELECT ""WhsCode"", ""WhsCode""|| ' - ' || ""WhsName"" FROM ""OWHS""")]
-            public static string FS_MSS_LISTAR_ALMACENES { get; set; }
+            [Query(CategoryName = MSS_GESTIONACTIVOSFIJOS, Query = @"SELECT ""WhsCode"", ""WhsCode""|| ' - ' || ""WhsName"" FROM ""OWHS""")]
+            public static class FS_MSS_LISTAR_ALMACENES { }
+
+            [Query(CategoryName = MSS_GESTIONACTIVOSFIJOS, Query = @"SELECT ""WhsCode"", ""WhsCode""|| ' - ' || ""WhsName"" FROM ""OWHS""")]
+            public static class FS_MSS_LISTAR_USUARIOS { }
         }
     }
 }

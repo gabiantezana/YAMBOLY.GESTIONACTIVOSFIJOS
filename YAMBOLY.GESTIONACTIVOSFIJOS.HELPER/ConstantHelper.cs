@@ -17,7 +17,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
         public static string PARAM2 = "param2";
         public const string PARENTPERMISSIONKEY = "MSS_PERM_PLANIF";
         public const string PARENTPERMISSIONNAME = "AddOn Planificación de Despachos";
-
+        public const string DEFAULT_SAP_SUCCESSBUTTON = "1";
 
         public static class SAP_YES_NO
         {

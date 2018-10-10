@@ -65,27 +65,34 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public String[] ChildFormColumns { get; set; } = new String[] { };
 
         public String[] ChildTableNameList { get; set; }
+
+    }
+
+    public class SAPQueryEntity
+    {
+        public string Query { get; set; }
+        public string QueryName { get; set; }
+        public string QueryCategory { get; set; }
     }
 
     public class SAPFormattedSearchEntity
     {
-        public string query { get; set; }
-        public string queryName { get; set; }
-        public string queryCategory { get; set; }
-        public string formId { get; set; }
-        public string fieldId { get; set; }
+        public string QueryName { get; set; }
+        public string QueryCategory { get; set; }
+        public string FormId { get; set; }
+        public string FieldId { get; set; }
     }
+
     public class MenuEntity
     {
-        public string menuUid { get; set; }
-        public string menuTitle { get; set; }
-        public List<MenuEntity> submmenuList { get; set; } = new List<MenuEntity>();
-        public MenuType menuType { get; set; }
-        public SubMenuType subMenuType { get; set; }
-        public string parentMenuId { get; set; }
+        public string MenuUid { get; set; }
+        public string MenuTitle { get; set; }
+        public MenuType MenuType { get; set; }
+        public SubMenuType SubMenuType { get; set; }
+        public string ParentMenuId { get; set; }
         public int FolderLevel { get; set; }
     }
-    
+
     public enum MenuType
     {
         MenuPrincipal = 1,

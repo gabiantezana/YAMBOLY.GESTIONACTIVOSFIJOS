@@ -21,6 +21,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
 
             var mForm = application.Forms.AddEx(fCreationParams);
             mForm.Settings.Enabled = true;
+            mForm.Visible = true;
+            mForm.Mode = BoFormMode.fm_ADD_MODE;
             return mForm;
         }
 

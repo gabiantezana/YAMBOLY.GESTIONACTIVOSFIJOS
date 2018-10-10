@@ -14,7 +14,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
 
     public interface ISAPForm : ISAPEvents
     {
-        Form GetForm();
+        //Form GetForm();
     }
 
     public interface ISAPEvents

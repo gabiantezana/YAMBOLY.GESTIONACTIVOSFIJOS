@@ -101,10 +101,11 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.DATAACCESS
             dBSchema.TableList.ForEach(x => SapMethodsHelper.CreateTable(GetCompany(), x));
             dBSchema.FieldList.ForEach(x => SapMethodsHelper.CreateField(GetCompany(), x));
             dBSchema.UDOList.ForEach(x => SapMethodsHelper.CreateUDO(GetCompany(), x));
-            dBSchema.FormattedSearchList.ForEach(x => SapMethodsHelper.CreateFMSMD(GetCompany(), x.queryName, x.query, x.formId, x.fieldId, x.queryCategory));
-            dBSchema.MenuList.Where(x => x.menuType == MenuType.MenuPrincipal).ToList().ForEach(x => SapMethodsHelper.CreatePrincipalMenul(GetApplication(), x.menuUid, x.menuTitle));
-            dBSchema.MenuList.Where(x => x.menuType == MenuType.SubMenu && x.subMenuType == SubMenuType.Folder).OrderByDescending(x=> x.FolderLevel).ToList().ForEach(x => SapMethodsHelper.CreateSubMenu(GetApplication(), x.parentMenuId, x.menuUid, x.menuTitle, (BoMenuType)x.subMenuType));
-            dBSchema.MenuList.Where(x => x.menuType == MenuType.SubMenu && x.subMenuType == SubMenuType.String).ToList().ForEach(x => SapMethodsHelper.CreateSubMenu(GetApplication(), x.parentMenuId, x.menuUid, x.menuTitle, (BoMenuType)x.subMenuType));
+            dBSchema.FormattedSearchList.ForEach(x => SapMethodsHelper.CreateQuery(GetCompany(), x.QueryName, x.Query, x.QueryCategory));
+            dBSchema.FormattedSearchFieldList.ForEach(x => SapMethodsHelper.AssignFormattedSearchToField(GetCompany(), x.QueryCategory, x.QueryName, x.FormId, x.FieldId));
+            dBSchema.MenuList.Where(x => x.MenuType == MenuType.MenuPrincipal).ToList().ForEach(x => SapMethodsHelper.CreatePrincipalMenul(GetApplication(), x.MenuUid, x.MenuTitle));
+            dBSchema.MenuList.Where(x => x.MenuType == MenuType.SubMenu && x.SubMenuType == SubMenuType.Folder).OrderByDescending(x=> x.FolderLevel).ToList().ForEach(x => SapMethodsHelper.CreateSubMenu(GetApplication(), x.ParentMenuId, x.MenuUid, x.MenuTitle, (BoMenuType)x.SubMenuType));
+            dBSchema.MenuList.Where(x => x.MenuType == MenuType.SubMenu && x.SubMenuType == SubMenuType.String).ToList().ForEach(x => SapMethodsHelper.CreateSubMenu(GetApplication(), x.ParentMenuId, x.MenuUid, x.MenuTitle, (BoMenuType)x.SubMenuType));
         }
 
         #region Queries 

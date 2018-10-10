@@ -1,16 +1,17 @@
-﻿using YAMBOLY.GESTIONACTIVOSFIJOS.HELPER;
+﻿
+using YAMBOLY.GESTIONACTIVOSFIJOS.HELPER;
 using SAPbouiCOM;
 using System.Collections.Generic;
-using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFSE;
+using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFPE;
 
-namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CFSEForm
+namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CFPEForm
 {
-    class MSS_CFSEForm : BaseApplication, ISAPForm
+    class MSS_CFPEForm : BaseApplication, ISAPForm
     {
-        public const string FormType = nameof(MSS_CFSE);
+        public const string FormType = nameof(MSS_CFPE);
         private Form _Form { get; set; }
 
-        public MSS_CFSEForm(Dictionary<string, ISAPForm> dictionary)
+        public MSS_CFPEForm(Dictionary<string, ISAPForm> dictionary)
         {
             _Form = SapFormHelper.CreateForm(GetApplication(), XMLHelper.GetXMLString(System.Reflection.Assembly.GetExecutingAssembly(), this.GetType().Name), FormType);
             dictionary.Add(_Form.UniqueID, this);

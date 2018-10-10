@@ -6,15 +6,14 @@ using SAPbouiCOM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-//using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_ASUAForm;
-//using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_ASUUForm;
-//using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_DESPForm;
 using YAMBOLY.GESTIONACTIVOSFIJOS.HELPER;
 using static YAMBOLY.GESTIONACTIVOSFIJOS.HELPER.ConstantHelper;
-using System.Threading;
+using SAPADDON.USERMODEL._Menu;
+using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFSE;
+using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CFSEForm;
 
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
-{ 
+{
     public class BaseApplication
     {
         public BaseApplication() { }
@@ -24,7 +23,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             try
             {
                 ConnectApplication();
-                ShowMessage(MessageType.Success, "El Addon se está cargando..."); 
+                ShowMessage(MessageType.Success, "El Addon se está cargando...");
 
                 ShowMessage(MessageType.Success, "Generando la estructura de base de datos...");
                 CreateDataBaseStructure(GetCompany());
@@ -34,7 +33,6 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 
                 SetApplicationEventFilters();
                 SetApplicationEvents();
-                //CreateAddonMenu();
                 ShowMessage(MessageType.Success, "El Addon se cargó exitosamente");
             }
             catch (Exception ex)
@@ -122,12 +120,14 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             return BaseDataAccess.GetFormOpenList();
         }
 
+        [Obsolete]
         public static bool FormTypeWasOpened(Type type, bool bringToFront = true)
         {
             var existingItem = GetFormOpenList().FirstOrDefault(x => x.Value.GetType() == type).Value;
             if (existingItem == null) return false;
-            if (bringToFront)
-                existingItem.GetForm().Select();
+            //TODO: //Resolve
+            //if (bringToFront)
+                //existingItem.GetForm().Select();
             return true;
         }
 
@@ -180,43 +180,56 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             EventFilter eventFilter = FilterList.Add(SAPbouiCOM.BoEventTypes.et_MENU_CLICK);
 
             eventFilter = FilterList.Add(SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED);
+            eventFilter.AddEx(nameof(MSS_CFSE));
+            /*
             eventFilter.AddEx(FormID.MSS_VEHI.IdToString());
             eventFilter.AddEx(FormID.MSS_DESP.IdToString());
             eventFilter.AddEx(FormID.MSS_DESP_LIST.IdToString());
             eventFilter.AddEx(FormID.MSS_APRO.IdToString());
             eventFilter.AddEx(FormID.MSS_ASUA.IdToString());
             eventFilter.AddEx(FormID.MSS_ASUU.IdToString());
-            eventFilter.AddEx(FormID.MSS_CONF.IdToString());
+            eventFilter.AddEx(FormID.MSS_CONF.IdToString());*/
 
             eventFilter = FilterList.Add(SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST);
+            eventFilter.AddEx(nameof(MSS_CFSE));
+            /*
             eventFilter.AddEx(FormID.MSS_DESP.IdToString());
             eventFilter.AddEx(FormID.MSS_ASUA.IdToString());
-            eventFilter.AddEx(FormID.MSS_ASUU.IdToString());
+            eventFilter.AddEx(FormID.MSS_ASUU.IdToString());*/
 
             eventFilter = FilterList.Add(SAPbouiCOM.BoEventTypes.et_COMBO_SELECT);
+            eventFilter.AddEx(nameof(MSS_CFSE));
+            /*
             eventFilter.AddEx(FormID.MSS_DESP.IdToString());
             eventFilter.AddEx(FormID.MSS_CONF.IdToString());
-            eventFilter.AddEx(FormID.MSS_VEHI.IdToString());
+            eventFilter.AddEx(FormID.MSS_VEHI.IdToString());*/
 
             eventFilter = FilterList.Add(BoEventTypes.et_VALIDATE);
-            eventFilter.AddEx(FormID.MSS_DESP.IdToString());
+            eventFilter.AddEx(nameof(MSS_CFSE));
+            /*eventFilter.AddEx(FormID.MSS_DESP.IdToString());*/
 
             eventFilter = FilterList.Add(BoEventTypes.et_FORM_DATA_ADD);
-            eventFilter.AddEx(FormID.MSS_DESP.IdToString());
+            eventFilter.AddEx(nameof(MSS_CFSE));
+            /*eventFilter.AddEx(FormID.MSS_DESP.IdToString());*/
 
             eventFilter = FilterList.Add(BoEventTypes.et_FORM_CLOSE);
+            eventFilter.AddEx(nameof(MSS_CFSE));
+            /*
             eventFilter.AddEx(FormID.MSS_ASUA.IdToString());
             eventFilter.AddEx(FormID.MSS_ASUU.IdToString());
-            eventFilter.AddEx(FormID.MSS_DESP_LIST.IdToString());
+            eventFilter.AddEx(FormID.MSS_DESP_LIST.IdToString());*/
 
             eventFilter = FilterList.Add(BoEventTypes.et_DOUBLE_CLICK);
-            eventFilter.AddEx(FormID.MSS_DESP_LIST.IdToString());
+            eventFilter.AddEx(nameof(MSS_CFSE));
+            /*eventFilter.AddEx(FormID.MSS_DESP_LIST.IdToString());*/
 
             eventFilter = FilterList.Add(BoEventTypes.et_FORM_DATA_LOAD);
-            eventFilter.AddEx(FormID.MSS_DESP.IdToString());
+            eventFilter.AddEx(nameof(MSS_CFSE));
+            /*eventFilter.AddEx(FormID.MSS_DESP.IdToString());*/
 
             eventFilter = FilterList.Add(BoEventTypes.et_LOST_FOCUS);
-            eventFilter.AddEx(FormID.MSS_DESP.IdToString());
+            eventFilter.AddEx(nameof(MSS_CFSE));
+            /*eventFilter.AddEx(FormID.MSS_DESP.IdToString());*/
 
             return FilterList;
         }
@@ -244,41 +257,26 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 
         }
 
+
         private void MenuEvent(ref SAPbouiCOM.MenuEvent menuEvent, out bool BubbleEvent)
         {
             BubbleEvent = true;
-            /*
             try
             {
                 if (!menuEvent.BeforeAction)
                 {
-                    if (Enum.TryParse(menuEvent.MenuUID, out MenuUID menuUID))
+                    switch (menuEvent.MenuUID)
                     {
-                        switch (menuUID)
-                        {
-                            case MenuUID.AutorizacionusuarioAlmacenSubMenu:
-                                new MSS_ASUAForm(GetFormOpenList());
-                                break;
-                            case MenuUID.DefinicionUsuarioAprobadorSubMenu:
-                                new MSS_ASUUForm(GetFormOpenList());
-                                break;
-                            case MenuUID.MaestroVehiculosSubMenu:
-                                new MSS_VEHIForm(GetFormOpenList());
-                                break;
-                            case MenuUID.DespachoVehiculosSubMenu:
-                                new MSS_DESPForm(GetFormOpenList());
-                                break;
-                            case MenuUID.AprobacionDespachoVehiculosSubMenu:
-                                new MSS_APROForm(GetFormOpenList());
-                                break;
-                            case MenuUID.ConfiguracionAddonSubMenu:
-                                new MSS_CONFForm(GetFormOpenList());
-                                break;
-                            default:
-                                if (GetFormOpenList().ContainsKey(GetActiveForm().UniqueID))
-                                    GetFormOpenList()[GetActiveForm().UniqueID].HandleMenuDataEvents(menuEvent);
-                                break;
-                        }
+                        case _Menu.MENU_PRINCIPAL.MENU_CONFIGURACION.MENU_CONFIGURACIONSERIES:
+                            new _MSS_CFSEForm.MSS_CFSEForm(GetFormOpenList());
+                            break;
+
+                        case _Menu.MENU_PRINCIPAL.MENU_CONFIGURACION.MENU_CONFIGURACIONPERMISOS:
+                            new _MSS_CFPEForm.MSS_CFPEForm(GetFormOpenList());
+                            break;
+
+                        default:
+                            break;
                     }
                 }
             }
@@ -291,7 +289,6 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
                 BubbleEvent = true;
                 GC.Collect();
             }
-            */
         }
 
         private void ItemEvent(string formUID, ref ItemEvent itemEvent, out bool BubbleEvent)
