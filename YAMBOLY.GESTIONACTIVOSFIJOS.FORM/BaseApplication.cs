@@ -275,6 +275,10 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
                             new _MSS_CFPEForm.MSS_CFPEForm(GetFormOpenList());
                             break;
 
+                        case _Menu.MENU_PRINCIPAL.MENU_CONTRATOCONCESIONACTIVOFIJO:
+                            new _MSS_CONTForm.MSS_CONTForm(GetFormOpenList());
+                            break;
+
                         default:
                             break;
                     }

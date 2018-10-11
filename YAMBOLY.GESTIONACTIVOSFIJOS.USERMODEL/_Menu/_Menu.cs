@@ -17,11 +17,10 @@ namespace SAPADDON.USERMODEL._Menu
 
                 [MenuItem(MenuTitle = "Configuración de permisos")]
                 public const string MENU_CONFIGURACIONPERMISOS = "MENU_CONFIGURACIONPERMISOS";
-             
             }
 
-            [MenuItem(MenuTitle = "Maestro 1")]
-            public const string MENU_MAESTROPRUEBAMENU = "MENU_MAESTROPRUEBAMENU";
+            [MenuItem(MenuTitle = "Contrato de concesión de activo fijo")]
+            public const string MENU_CONTRATOCONCESIONACTIVOFIJO = "MENU_CONTRATOCONCESIONACTIVOFIJO";
         }
     }
 }

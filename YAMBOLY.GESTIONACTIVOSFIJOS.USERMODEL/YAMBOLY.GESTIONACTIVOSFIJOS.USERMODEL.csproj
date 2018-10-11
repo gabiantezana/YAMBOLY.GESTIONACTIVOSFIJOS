@@ -76,6 +76,9 @@
   <ItemGroup>
     <Compile Include="_FormattedSearches\_FormattedSearches.cs" />
     <Compile Include="_Menu\_Menu.cs" />
+    <Compile Include="_MSS_CONT\MSS_CONT.cs" />
+    <Compile Include="_MSS_CONT\MSS_CONT_LINES.cs" />
+    <Compile Include="_MSS_CONT\MSS_CONT_UDO.cs" />
     <Compile Include="_MSS_AFHI\MSS_AFHI.cs" />
     <Compile Include="_MSS_AFHI\MSS_AFHI_LINES.cs" />
     <Compile Include="_MSS_AFHI\MSS_AFHI_UDO.cs" />
