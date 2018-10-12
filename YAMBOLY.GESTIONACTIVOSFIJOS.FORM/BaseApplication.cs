@@ -127,7 +127,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             if (existingItem == null) return false;
             //TODO: //Resolve
             //if (bringToFront)
-                //existingItem.GetForm().Select();
+            //existingItem.GetForm().Select();
             return true;
         }
 

@@ -37,7 +37,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
             }
         }
 
-        public static string GetXMLString(Assembly assembly, string resourceName)
+        public static string GetResourceString(Assembly assembly, string resourceName)
         {
             var resourceFullName = assembly.GetManifestResourceNames().ToList().FirstOrDefault(x => x.Contains(resourceName));
             if (string.IsNullOrEmpty(resourceFullName))

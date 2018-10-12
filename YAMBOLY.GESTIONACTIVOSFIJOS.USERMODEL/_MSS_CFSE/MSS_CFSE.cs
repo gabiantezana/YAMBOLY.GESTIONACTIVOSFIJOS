@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static SAPADDON.USERMODEL._FormattedSearches.FormattedSearches;
+using static SAPADDON.USERMODEL._FormattedSearches.Queries;
 
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFSE
 {
@@ -24,17 +24,17 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFSE
 
         #region Campos de usuario
 
-        [SAPField(FieldDescription = "Serie SAP Entrega", FormattedSearchType = typeof(FormattedSearch.FS_MSS_LISTAR_SERIES_ENTREGA))]
-        public static string MSS_SEEN { get; set; }
+        [SAPField(FieldDescription = "Serie SAP Entrega", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.FS_MSS_LISTAR_SERIES_ENTREGA))]
+        public static string U_MSS_SEEN { get; set; }
 
-        [SAPField(FieldDescription = "Serie SAP Devolucion", FormattedSearchType = typeof(FormattedSearch.FS_MSS_LISTAR_SERIES_DEVOLUCION))]
-        public static string MSS_SEDE { get; set; }
+        [SAPField(FieldDescription = "Serie SAP Devolucion", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.FS_MSS_LISTAR_SERIES_DEVOLUCION))]
+        public static string U_MSS_SEDE { get; set; }
 
         [SAPField(FieldDescription = "Numero maximo de lineas", FieldType = SAPbobsCOM.BoFieldTypes.db_Numeric, FieldSubType = SAPbobsCOM.BoFldSubTypes.st_Quantity, FieldSize = 4)]
-        public static string MSS_NULI { get; set; }
+        public static string U_MSS_NULI { get; set; }
 
-        [SAPField(FieldDescription = "Codigo de almacen", FormattedSearchType = typeof(FormattedSearch.FS_MSS_LISTAR_ALMACENES))]
-        public static string MSS_COAL { get; set; }
+        [SAPField(FieldDescription = "Codigo de almacen", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.FS_MSS_LISTAR_ALMACENES))]
+        public static string U_MSS_COAL { get; set; }
 
         #endregion
 

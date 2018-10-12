@@ -13,7 +13,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CFPEForm
 
         public MSS_CFPEForm(Dictionary<string, ISAPForm> dictionary)
         {
-            _Form = SapFormHelper.CreateForm(GetApplication(), XMLHelper.GetXMLString(System.Reflection.Assembly.GetExecutingAssembly(), this.GetType().Name), FormType);
+            _Form = SapFormHelper.CreateForm(GetApplication(), XMLHelper.GetResourceString(System.Reflection.Assembly.GetExecutingAssembly(), this.GetType().Name), FormType);
             dictionary.Add(_Form.UniqueID, this);
         }
 

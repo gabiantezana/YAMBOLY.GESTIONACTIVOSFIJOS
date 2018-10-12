@@ -1,0 +1,1 @@
+﻿SELECT "CntctCode", "Name",* FROM "OCPR" WHERE "CardCode" =$["@MSS_CONT".U_MSS_CCOD];

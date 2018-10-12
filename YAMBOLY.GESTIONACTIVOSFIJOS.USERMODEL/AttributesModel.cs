@@ -59,7 +59,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public BoFldSubTypes FieldSubType { get; set; } = BoFldSubTypes.st_None;
         public Int32 FieldSize { get; set; } = 200;
         public BoYesNoEnum IsRequired { get; set; } = BoYesNoEnum.tNO;
-        public String[] ValidValues { get; set; } = new String[] { };
+        public String[] ValidValues { get; set; } = new String[] { };//TODO: UPDATE VALID VALUES IF EXISTS
         public String[] ValidDescription { get; set; } = new String[] { };
         public String DefaultValue { get; set; } = String.Empty;
         public String VinculatedTable { get; set; } = String.Empty;
@@ -112,15 +112,15 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
     /// <summary>
     /// Atributo para la clase que contiene los queries
     /// </summary>
-    internal class QueryListAttribute : Attribute { }
+    internal class QueryCategory : Attribute { }
     /// <summary>
-    /// Atributo para generar queries, toma el nombre de la clase como nombre del query. Este atributo solo se puede asignar a una clase
+    /// Atributo para generar queries, toma el nombre de la clase como nombre del query y el query que está contenido dentro de la carpeta QueryString con el archivo del mismo nombre 
     /// </summary>
     internal class QueryAttribute : Attribute
     {
-        public string Query { get; set; }
-        public string QueryName { get; set; }
-        public string CategoryName { get; set; }
+        //public string Query { get; set; }
+        //public string QueryName { get; set; }
+        //public string CategoryName { get; set; }
     }
 
     internal static class AttributeExtensions

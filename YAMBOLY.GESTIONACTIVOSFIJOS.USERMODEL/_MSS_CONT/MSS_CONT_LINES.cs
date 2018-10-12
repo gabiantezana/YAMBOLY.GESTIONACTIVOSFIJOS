@@ -4,18 +4,18 @@
     public class MSS_CONT_LINES
     {
         [SAPField(FieldDescription = "Código inventario AF")]
-        public string MSS_AFCI { get; set; }
+        public string U_MSS_AFCI { get; set; }
 
         [SAPField(FieldDescription = "Código  AF")]
-        public string MSS_AFCO { get; set; }
+        public string U_MSS_AFCO { get; set; }
 
         [SAPField(FieldDescription = "Descripción AF")]
-        public string MSS_AFDE { get; set; }
+        public string U_MSS_AFDE { get; set; }
 
         [SAPField(FieldDescription = "Valor adquisición")]
-        public string MSS_AFVA { get; set; }
+        public string U_MSS_AFVA { get; set; }
 
         [SAPField(FieldDescription = "Anexo")]
-        public string MSS_ANEX { get; set; }
+        public string U_MSS_ANEX { get; set; }
     }
 }

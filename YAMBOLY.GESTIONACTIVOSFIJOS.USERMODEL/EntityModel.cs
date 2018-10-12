@@ -105,4 +105,12 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         String = 1,//DONT CHANGE ID
         Folder = 2,//DONT CHANGE ID
     }
+
+
+    public class KeyValue
+    {
+        public string Key { get; set; }
+        public string Value { get; set; }
+    }
+
 }

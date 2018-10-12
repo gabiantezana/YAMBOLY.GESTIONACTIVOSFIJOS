@@ -64,6 +64,18 @@
       <HintPath>..\packages\sapb1\Interop.SAPbouiCOM.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.OData.Client, Version=7.5.1.20914, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.OData.Client.7.5.1\lib\net45\Microsoft.OData.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.OData.Core, Version=7.5.1.20914, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.OData.Core.7.5.1\lib\portable-net45+win8+wpa81\Microsoft.OData.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.OData.Edm, Version=7.5.1.20914, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.OData.Edm.7.5.1\lib\portable-net45+win8+wpa81\Microsoft.OData.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Spatial, Version=7.5.1.20914, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Spatial.7.5.1\lib\portable-net45+win8+wpa81\Microsoft.Spatial.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -74,7 +86,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="_FormattedSearches\_FormattedSearches.cs" />
+    <Compile Include="_Queries\Queries.cs" />
     <Compile Include="_Menu\_Menu.cs" />
     <Compile Include="_MSS_CONT\MSS_CONT.cs" />
     <Compile Include="_MSS_CONT\MSS_CONT_LINES.cs" />
@@ -93,6 +105,19 @@
     <Compile Include="_ODLN\ODLN.cs" />
     <Compile Include="_OITM\OITM.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_ALMACENES.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_ALMACENES_PERMITIDOS.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_CLIENTES.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_DIRECCIONES_DESTINO.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_MONEDAS.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_PERSONAS_CONTACTO.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_SERIES_DEVOLUCION.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_USUARIOS.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_SERIES_ENTREGA.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

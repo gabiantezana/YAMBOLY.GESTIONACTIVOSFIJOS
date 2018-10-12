@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using SAPbobsCOM;
@@ -94,42 +95,30 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
             return entity;
         }
 
-        private void DefineFormattedSearchs(string containingFolderName = null)
+        private void DefineQueries(string containingFolderName = null)
         {
             try
             {
-                IEnumerable<Type> formattedSearchesListTypes = Assembly.GetExecutingAssembly().GetTypes().Where(x => (x.GetAttributeValue((QueryListAttribute att) => att != null)));
+                IEnumerable<Type> formattedSearchesListTypes = Assembly.GetExecutingAssembly().GetTypes().Where(x => (x.GetAttributeValue((QueryCategory att) => att != null)));
                 if (!String.IsNullOrEmpty(containingFolderName))
                     formattedSearchesListTypes.Where(x => string.Equals(x.Namespace, containingFolderName, StringComparison.Ordinal));
 
                 //Por cada clase que tenga el atributo Listadebúsquedasformateadas
                 foreach (Type type in formattedSearchesListTypes)
                 {
+                    var categoryName = type.Name;
                     //Por cada ítem de tipo búsqueda formateada dentro de un listado
-                    //foreach (var itemType in type.GetProperties())
                     foreach (var itemType in type.GetNestedTypes())
                     {
                         if (Attribute.IsDefined(itemType, typeof(QueryAttribute)))
                         {
                             SAPQueryEntity entity = new SAPQueryEntity
                             {
-                                Query = itemType.GetAttributeValue((QueryAttribute att) => att.Query),
-                                QueryName = itemType.GetAttributeValue((QueryAttribute att) => att.QueryName) ?? itemType.Name,
-                                QueryCategory = itemType.GetAttributeValue((QueryAttribute att) => att.CategoryName),
+                                Query = GetResourceString(Assembly.GetExecutingAssembly(), itemType.Name),
+                                QueryName = itemType.Name,
+                                QueryCategory = categoryName
                             };
                             _Schema.FormattedSearchList.Add(entity);
-                            /*
-                            var fieldsAndFormIds = itemType.GetAttributeValue((FormattedSearchAttribute att) => att.fieldAndFormNames);
-                            foreach (var value in fieldsAndFormIds)
-                            {
-                                if (value.Split('.')?.Count() == 2)
-                                {
-                                    entity.formId = value.Split('.')[0];
-                                    entity.fieldId = value.Split('.')[1];
-                                }
-
-                                _Schema.FormattedSearchList.Add(entity);
-                            }*/
                         }
                     }
                 }
@@ -158,13 +147,14 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
                         TableType = type.GetAttributeValue((SAPTableAttribute att) => att.TableType),
                     };
 
+
                     foreach (var itemType in type.GetProperties())
                     {
                         if (!itemType.GetAttributeValue((SAPFieldAttribute att) => att.IsSystemField))
                         {
                             SAPFieldEntity userField = new SAPFieldEntity
                             {
-                                FieldName = itemType.Name,
+                                FieldName = itemType.Name.StartsWith("U_") ? itemType.Name.Remove(0, 2) : itemType.Name,
                                 FieldDescription = itemType.GetAttributeValue((SAPFieldAttribute att) => att.FieldDescription) ?? itemType.Name,
                                 FieldSize = itemType.GetAttributeValue((SAPFieldAttribute att) => att.FieldSize),
                                 FieldType = itemType.GetAttributeValue((SAPFieldAttribute att) => att.FieldType),
@@ -217,7 +207,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
                     if (udo.CanCreateDefaultForm == BoYesNoEnum.tYES)
                     {
                         var userFieldsName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
-                            .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ShowFieldInDefaultForm && attr2.IsSystemField == false)).Select(y => "U_" + y.Name).ToArray();
+                            .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ShowFieldInDefaultForm && attr2.IsSystemField == false)).Select(y => y.Name).ToArray();
 
                         var defaultFields = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
                             .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ShowFieldInDefaultForm && attr2.IsSystemField)).Select(y => y.Name).ToArray();
@@ -232,7 +222,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
                     if (udo.CanFind == BoYesNoEnum.tYES)
                     {
                         var userFieldsName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
-                            .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSearchField && attr2.IsSystemField == false)).Select(y => "U_" + y.Name).ToArray();
+                            .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSearchField && attr2.IsSystemField == false)).Select(y => y.Name).ToArray();
 
                         var defaultFields = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
                             .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSearchField && attr2.IsSystemField)).Select(y => y.Name).ToArray();
@@ -250,13 +240,13 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
 
                     foreach (var item in list)
                     {
-                        var formattedSearchType = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType);
+                        var queryListType = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType).ReflectedType;//Base type to get the parent class of query than contains queryCategory
                         _Schema.FormattedSearchFieldList.Add(new SAPFormattedSearchEntity()
                         {
-                            FieldId = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSystemField) ? item.Name : "U_" + item.Name,
+                            FieldId = item.Name,
                             FormId = udo.Code,
-                            QueryCategory = formattedSearchType.GetAttributeValue((QueryAttribute x) => x.CategoryName),
-                            QueryName = formattedSearchType.Name
+                            QueryCategory = queryListType.Name,
+                            QueryName = queryListType.Name
                         });
                     };
                     //----------------------------------------------------DEFINE CAMPOS ASOCIADOS A BÚSQUEDAS FORMATEADAS------------------------------------------------------
@@ -273,7 +263,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public DBSchema GetDBSchema()
         {
             DefineSAPTablesAndFields();
-            DefineFormattedSearchs();
+            DefineQueries();
             DefineSAPUDOsAndFormattedSearchFields();
             DefineMenuItems();
             return _Schema;
@@ -284,8 +274,21 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         {
             DefineSAPTablesAndFields(containerFolderName);
             DefineSAPUDOsAndFormattedSearchFields(containerFolderName);
-            DefineFormattedSearchs();
+            DefineQueries();
             return _Schema;
+        }
+
+        public static string GetResourceString(Assembly assembly, string resourceName)
+        {
+            var resourceFullName = assembly.GetManifestResourceNames().ToList().FirstOrDefault(x => x.Contains(resourceName));
+            if (string.IsNullOrEmpty(resourceFullName))
+                throw new Exception("ResourceName not found: " + resourceName);
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceFullName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
         }
     }
 
@@ -298,5 +301,6 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public List<MenuEntity> MenuList { get; set; } = new List<MenuEntity>();
         public List<SAPFormattedSearchEntity> FormattedSearchFieldList { get; set; } = new List<SAPFormattedSearchEntity>();
     }
+
 
 }
