@@ -507,7 +507,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
             }
         }
 
-        public static bool CreateQuery(Company oCompany, string queryName, string query, string queryCategory, bool createCategory = false, bool removeIfExists = false)
+        public static bool CreateQuery(Company oCompany, string queryName, string query, string queryCategory, bool createCategory = true, bool removeIfExists = false)
         {
             SAPbobsCOM.UserQueries oUserQueries = null;
             string sqlQuery = string.Empty;
@@ -518,7 +518,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
                 if (removeIfExists) { RemoveQuery(oCompany, queryName, queryCategory); }
                 if (createCategory) { CreateQueryCategory(oCompany, queryCategory); }
 
-                if (GetIDQuery(oCompany, queryName, GetIDQueryCategory(oCompany, queryCategory)) == -1)
+                var exists = GetIDQuery(oCompany, queryName, GetIDQueryCategory(oCompany, queryCategory)) == -1;
+                if (exists)
                 {
                     oUserQueries = (SAPbobsCOM.UserQueries)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oUserQueries);
                     oUserQueries.Query = query;

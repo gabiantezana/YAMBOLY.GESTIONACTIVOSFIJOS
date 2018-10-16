@@ -246,7 +246,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
                             FieldId = item.Name,
                             FormId = udo.Code,
                             QueryCategory = queryListType.Name,
-                            QueryName = queryListType.Name
+                            QueryName = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType).Name
                         });
                     };
                     //----------------------------------------------------DEFINE CAMPOS ASOCIADOS A BÚSQUEDAS FORMATEADAS------------------------------------------------------

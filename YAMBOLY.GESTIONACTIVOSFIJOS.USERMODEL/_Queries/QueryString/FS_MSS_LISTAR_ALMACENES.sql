@@ -1,1 +1,0 @@
-﻿SELECT "WhsCode", "WhsCode"|| ' - ' || "WhsName",* FROM "OWHS"

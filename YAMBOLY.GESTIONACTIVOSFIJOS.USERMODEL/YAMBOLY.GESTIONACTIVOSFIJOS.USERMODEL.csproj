@@ -109,15 +109,15 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_ALMACENES.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_ALMACENES_PERMITIDOS.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_CLIENTES.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_DIRECCIONES_DESTINO.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_MONEDAS.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_PERSONAS_CONTACTO.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_SERIES_DEVOLUCION.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_USUARIOS.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\FS_MSS_LISTAR_SERIES_ENTREGA.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_ALMACENES.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_ALMACENES_PERMITIDOS.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_CLIENTES.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_DIRECCIONES_DESTINO.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_MONEDAS.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_PERSONAS_CONTACTO.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_SERIES_DEVOLUCION.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_USUARIOS.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_SERIES_ENTREGA.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

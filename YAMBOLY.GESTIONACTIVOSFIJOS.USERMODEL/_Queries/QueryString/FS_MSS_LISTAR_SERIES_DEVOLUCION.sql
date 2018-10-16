@@ -1,1 +1,0 @@
-﻿SELECT "AcctCode", "AcctCode" || ' - ' || "AcctName",* FROM "OACT"

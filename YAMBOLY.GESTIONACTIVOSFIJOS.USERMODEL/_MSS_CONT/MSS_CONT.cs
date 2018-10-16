@@ -27,10 +27,10 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
             ValidDescription = new[] { ESTADO.PENDIENTE.VALUE, ESTADO.LEGALIZADO.VALUE, ESTADO.IMPRESO.VALUE, ESTADO.RECHAZADO.VALUE })]
         public static string U_MSS_ESTA { get; set; }
 
-        [SAPField(FieldDescription = "Almacén despacho", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.FS_MSS_LISTAR_ALMACENES_PERMITIDOS))]
+        [SAPField(FieldDescription = "Almacén despacho", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_ALMACENES_PERMITIDOS))]
         public static string U_MSS_ADES { get; set; }
 
-        [SAPField(FieldDescription = "Moneda", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.FS_MSS_LISTAR_MONEDAS))]
+        [SAPField(FieldDescription = "Moneda", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_MONEDAS))]
         public static string U_MSS_MONE { get; set; }
 
         [SAPField(FieldDescription = "Monto anulación contrato", FieldType = SAPbobsCOM.BoFieldTypes.db_Numeric, FieldSubType = SAPbobsCOM.BoFldSubTypes.st_Price)]
@@ -52,7 +52,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
 
         #region Datos de cliente
 
-        [SAPField(FieldDescription = "Código cliente", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.FS_MSS_LISTAR_CLIENTES))]
+        [SAPField(FieldDescription = "Código cliente", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_CLIENTES))]
         public static string U_MSS_CCOD { get; set; }
 
         [SAPField(FieldDescription = "Nombre cliente")]
@@ -61,13 +61,13 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
         [SAPField(FieldDescription = "RUC Cliente")]
         public static string U_MSS_CRUC { get; set; }
 
-        [SAPField(FieldDescription = "Código dirección fiscal cliente", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.FS_MSS_LISTAR_DIRECCIONES_DESTINO))]
+        [SAPField(FieldDescription = "Código dirección fiscal cliente", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_DIRECCIONES_DESTINO))]
         public static string U_MSS_CDFI { get; set; }
 
         [SAPField(FieldDescription = "Desc. dirección fiscal cliente")]
         public static string U_MSS_CDFD { get; set; }
 
-        [SAPField(FieldDescription = "Código dirección entrega cliente", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.FS_MSS_LISTAR_DIRECCIONES_DESTINO))]
+        [SAPField(FieldDescription = "Código dirección entrega cliente", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_DIRECCIONES_DESTINO))]
         public static string U_MSS_CDEN { get; set; }
 
         [SAPField(FieldDescription = "Desc. dirección entrega cliente")]
@@ -83,7 +83,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
 
         #region Datos de representante
 
-        [SAPField(FieldDescription = "Código representante", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.FS_MSS_LISTAR_PERSONAS_CONTACTO))]
+        [SAPField(FieldDescription = "Código representante", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_PERSONAS_CONTACTO))]
         public static string U_MSS_RCOD { get; set; }
 
         [SAPField(FieldDescription = "Nombre representante")]
@@ -99,7 +99,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
 
         #region Datos de depositario
 
-        [SAPField(FieldDescription = "Código depositario", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.FS_MSS_LISTAR_PERSONAS_CONTACTO))] 
+        [SAPField(FieldDescription = "Código depositario", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_PERSONAS_CONTACTO))] 
         public static string U_MSS_DCOD { get; set; }
 
         [SAPField(FieldDescription = "Nombre depositario")]
