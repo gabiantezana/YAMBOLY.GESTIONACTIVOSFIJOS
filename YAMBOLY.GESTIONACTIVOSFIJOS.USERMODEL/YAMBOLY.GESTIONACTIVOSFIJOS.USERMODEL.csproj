@@ -86,6 +86,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helper\FileHelper.cs" />
     <Compile Include="_Queries\Queries.cs" />
     <Compile Include="_Menu\_Menu.cs" />
     <Compile Include="_MSS_CONT\MSS_CONT.cs" />
@@ -109,15 +110,60 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_ALMACENES.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_ALMACENES_PERMITIDOS.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_CLIENTES.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_DIRECCIONES_DESTINO.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_MONEDAS.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_PERSONAS_CONTACTO.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_SERIES_DEVOLUCION.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_USUARIOS.sql" />
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LISTAR_SERIES_ENTREGA.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LIST_ALMACENES.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LIST_ALMACENES_PERMITIDOS.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_LIST.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_ADDRESS_LIST.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LIST_MONEDAS.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_CONTACTPERSON_LIST.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LIST_SERIES_DEVOLUCION.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LIST_USUARIOS.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LIST_SERIES_ENTREGA.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_OBTENER_CLIENTE.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_OBTENER_CLIENTE_DIRECCION.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_CARDNAME.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_LICTRADNUM.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_ADDRESS_DESCRIPTION_U_MSS_CDFD.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_CONTACTPERSON_NAME_U_MSS_RNOM.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_CONTACTPERSON_DNI_U_MSS_DDNI.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_CONTACTPERSON_ADDRESS_U_MSS_RDIR.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_ADDRESS_DESCRIPTION_U_MSS_CDED.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_CONTACTPERSON_DNI_U_MSS_RDNI.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_CONTACTPERSON_ADDRESS_U_MSS_DDIR.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_CONTACTPERSON_NAME_U_MSS_DNOM.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_OITM_LIST.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_OITM_ITEMCODE.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_OITM_ITEMNAME.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

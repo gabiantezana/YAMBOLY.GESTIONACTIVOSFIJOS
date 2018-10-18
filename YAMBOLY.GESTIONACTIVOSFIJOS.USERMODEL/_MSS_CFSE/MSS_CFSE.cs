@@ -24,16 +24,16 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFSE
 
         #region Campos de usuario
 
-        [SAPField(FieldDescription = "Serie SAP Entrega", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_SERIES_ENTREGA))]
+        [SAPField(FieldDescription = "Serie SAP Entrega", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_LIST_SERIES_ENTREGA))]
         public static string U_MSS_SEEN { get; set; }
 
-        [SAPField(FieldDescription = "Serie SAP Devolucion", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_SERIES_DEVOLUCION))]
+        [SAPField(FieldDescription = "Serie SAP Devolucion", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_LIST_SERIES_DEVOLUCION))]
         public static string U_MSS_SEDE { get; set; }
 
         [SAPField(FieldDescription = "Numero maximo de lineas", FieldType = SAPbobsCOM.BoFieldTypes.db_Numeric, FieldSubType = SAPbobsCOM.BoFldSubTypes.st_Quantity, FieldSize = 4)]
         public static string U_MSS_NULI { get; set; }
 
-        [SAPField(FieldDescription = "Codigo de almacen", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_ALMACENES))]
+        [SAPField(FieldDescription = "Codigo de almacen", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_LIST_ALMACENES))]
         public static string U_MSS_COAL { get; set; }
 
         #endregion

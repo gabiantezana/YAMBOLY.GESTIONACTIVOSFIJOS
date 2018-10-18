@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT;
 using System;
 using static YAMBOLY.GESTIONACTIVOSFIJOS.HELPER.ConstantHelper;
+using System.Reflection;
+using SAPADDON.USERMODEL.Helper;
+using SAPADDON.USERMODEL._FormattedSearches;
 
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 {
@@ -18,6 +21,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             dictionary.Add(_Form.UniqueID, this);
             LoadSeries();
             SetEstadoAsPendiente();
+            GetMatrix().AddRow();
             _Form.EnableFormatSearch();
         }
 
@@ -32,16 +36,23 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
         {
             try
             {
-                (GetItem(MSS_CONT.Series) as ComboBox)?.ValidValues.LoadSeries(_Form.BusinessObject.Type, BoSeriesMode.sf_View);
+                (GetItem(nameof(MSS_CONT.Series)) as ComboBox)?.ValidValues.LoadSeries(_Form.BusinessObject.Type, BoSeriesMode.sf_View);
+                LoadNumeration();
             }
-            catch { }
+            catch (Exception ex)
+            { }
         }
 
         private void LoadNumeration()
         {
-            var cbSeries = (GetItem(MSS_CONT.Series) as ComboBox);
-            GetDataSource().SetValue(MSS_CONT.DocNum, 0, _Form.BusinessObject.GetNextSerialNumber(cbSeries?.Selected?.Value, _Form.BusinessObject.Type).ToSafeString());
+            var cbSeries = (GetItem(nameof(MSS_CONT.Series)) as ComboBox);
+            GetDataSource().SetValue(nameof(MSS_CONT.DocNum), 0, _Form.BusinessObject.GetNextSerialNumber(cbSeries?.Selected?.Value, _Form.BusinessObject.Type).ToSafeString());
             _Form.Refresh();
+        }
+
+        private Matrix GetMatrix()
+        {
+            return _Form.Items.Item("MATRIX").Specific as Matrix;
         }
 
         private DBDataSource GetDataSource()
@@ -53,6 +64,27 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
         {
             return _Form.Items.Item(itemName).Specific;
         }
+
+        #region Queries
+
+        private void SetBusinessPartnerInfo(string cardCode)
+        {
+            string query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_OBTENER_CLIENTE));
+            query = query.Replace(ConstantHelper.PARAM1, cardCode);
+            var recordSet = new SapMethodsHelper().DoQuery(GetCompany(), query);
+            if (recordSet.RecordCount > 0)
+            {
+                (GetItem(nameof(MSS_CONT.U_MSS_CNOM)) as EditText).Value = recordSet.Fields.Item(0).Value;
+                (GetItem(nameof(MSS_CONT.U_MSS_CRUC)) as EditText).Value = recordSet.Fields.Item(1).Value;
+            }
+        }
+
+        private void GetAddress(string cardCode, string address)
+        {
+
+        }
+
+        #endregion
 
         #region Events
 

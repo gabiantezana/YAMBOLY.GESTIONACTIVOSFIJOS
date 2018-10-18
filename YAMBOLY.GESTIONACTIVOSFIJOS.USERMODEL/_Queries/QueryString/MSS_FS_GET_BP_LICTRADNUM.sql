@@ -1,0 +1,1 @@
+﻿SELECT "LicTradNum" FROM "OCRD" WHERE "CardCode" =$["@MSS_CONT".U_MSS_CCOD];

@@ -81,6 +81,9 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public string QueryCategory { get; set; }
         public string FormId { get; set; }
         public string FieldId { get; set; }
+        public bool ForceRefreshing { get; set; }
+        public string ParentFieldOnChange { get; set; }
+        public bool IsChildTable { get; set; }
     }
 
     public class MenuEntity

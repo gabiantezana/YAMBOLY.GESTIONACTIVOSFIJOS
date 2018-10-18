@@ -126,11 +126,6 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
 
                     if (oUserFieldsMD.Add() != ConstantHelper.DefaulSuccessSAPNumber)
                         throw new SapException();
-                    else
-                    {
-                        if ((!string.IsNullOrEmpty(formattedSearchCategory)) && !string.IsNullOrEmpty(formattedSearchName))
-                            AssignFormattedSearchToField(_Company, formattedSearchCategory, formattedSearchName, tableName, fieldName);
-                    }
                 }
             }
             catch (Exception ex)
@@ -405,7 +400,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
             }
         }
 
-        public static bool AssignFormattedSearchToField(Company oCompany, string queryCategory, string queryName, string formID, string itemID)
+        public static bool AssignFormattedSearchToField(Company oCompany, string queryCategory, string queryName, string formID, string itemID, bool forceRefreshstring, string parentFieldOnChange, bool isChildTable = false)
         {
             string columnID = "-1";
             SAPbobsCOM.FormattedSearches oFormattedSearches = null;
@@ -414,7 +409,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
             try
             {
                 oFormattedSearches = (SAPbobsCOM.FormattedSearches)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oFormattedSearches);
-                var exists = oFormattedSearches.GetByKey(GetIDFormattedSearchs(oCompany, formID, itemID, columnID));
+                var exists = oFormattedSearches.GetByKey(GetIDFormattedSearchs(oCompany, formID, isChildTable ? "MATRIX" : itemID, isChildTable ? itemID : "-1"));
 
                 if (exists)
                 {
@@ -429,14 +424,25 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
                     oFormattedSearches = (SAPbobsCOM.FormattedSearches)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oFormattedSearches);
                     oFormattedSearches.FormID = formID;
                     oFormattedSearches.ItemID = itemID;
-                    if (columnID != "-1") { oFormattedSearches.ColumnID = columnID; }
+                    //if (columnID != "-1") { oFormattedSearches.ColumnID = columnID; }
+                    if (isChildTable)
+                    {
+                        oFormattedSearches.ItemID = "MATRIX";
+                        oFormattedSearches.ColumnID = itemID;
+                    }
+
                     oFormattedSearches.Action = SAPbobsCOM.BoFormattedSearchActionEnum.bofsaQuery;
                     oFormattedSearches.QueryID = GetIDQuery(oCompany, queryName, GetIDQueryCategory(oCompany, queryCategory));
-                    oFormattedSearches.Refresh = SAPbobsCOM.BoYesNoEnum.tNO;
+                    oFormattedSearches.Refresh = forceRefreshstring ? BoYesNoEnum.tYES : SAPbobsCOM.BoYesNoEnum.tNO;
+                    oFormattedSearches.ForceRefresh = forceRefreshstring ? BoYesNoEnum.tYES : BoYesNoEnum.tYES;
+                    oFormattedSearches.FieldID = forceRefreshstring ? parentFieldOnChange : null;
 
                     result = oFormattedSearches.Add();
                     if (result != 0)
+                    {
+                        var error = oCompany.GetLastErrorDescription();
                         return false;
+                    }
                 }
 
                 return true;
@@ -507,36 +513,40 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
             }
         }
 
-        public static bool CreateQuery(Company oCompany, string queryName, string query, string queryCategory, bool createCategory = true, bool removeIfExists = false)
+        public static bool CreateQuery(Company oCompany, string queryName, string query, string queryCategory, bool createCategory = true, bool removeIfExists = true)
         {
-            SAPbobsCOM.UserQueries oUserQueries = null;
+            SAPbobsCOM.UserQueries oUserQueries = (SAPbobsCOM.UserQueries)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oUserQueries);
             string sqlQuery = string.Empty;
             int result = 0;
 
             try
             {
-                if (removeIfExists) { RemoveQuery(oCompany, queryName, queryCategory); }
+                //if (removeIfExists) { RemoveQuery(oCompany, queryName, queryCategory); }
                 if (createCategory) { CreateQueryCategory(oCompany, queryCategory); }
 
-                var exists = GetIDQuery(oCompany, queryName, GetIDQueryCategory(oCompany, queryCategory)) == -1;
+                var idCategory = GetIDQueryCategory(oCompany, queryCategory);
+                var idQuery = GetIDQuery(oCompany, queryName, idCategory);
+                var exists = idQuery != -1;
                 if (exists)
-                {
-                    oUserQueries = (SAPbobsCOM.UserQueries)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oUserQueries);
-                    oUserQueries.Query = query;
-                    oUserQueries.QueryCategory = GetIDQueryCategory(oCompany, queryCategory);
-                    oUserQueries.QueryDescription = queryName;
+                    oUserQueries.GetByKey(idQuery, idCategory);
+
+                oUserQueries.Query = query;
+                oUserQueries.QueryCategory = GetIDQueryCategory(oCompany, queryCategory);
+                oUserQueries.QueryDescription = queryName;
+                if (exists)
+                    result = oUserQueries.Update();
+                else
                     result = oUserQueries.Add();
-                    if (result != 0)
-                        return false;
-                    return true;
-                }
+
+                if (result != 0)
+                    return false;
+                return true;
+
             }
-            catch
+            catch (Exception ex)
             {
                 throw new SapException();
             }
-
-            return true;
         }
 
         private static int GetIDQuery(Company oCompany, string queryName, int categoryID)
@@ -745,5 +755,17 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
                 oMenus.AddEx(oCreationPackage);
             }
         }
+
+
+        #region Queries 
+
+        public SAPbobsCOM.Recordset DoQuery(Company company, string query)
+        {
+            var oRecordSet = ((SAPbobsCOM.Recordset)(company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)));
+            oRecordSet.DoQuery(query);
+            return oRecordSet;
+        }
+
+        #endregion
     }
 }

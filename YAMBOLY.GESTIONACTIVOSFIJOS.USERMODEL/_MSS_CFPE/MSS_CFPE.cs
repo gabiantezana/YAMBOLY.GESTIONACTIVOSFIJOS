@@ -9,10 +9,10 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFPE
     [SAPTable(TableDescription = "AF- Conf. Permisos", TableType = SAPbobsCOM.BoUTBTableType.bott_Document)]
     public class MSS_CFPE
     {
-        [SAPField(FieldDescription = "Código usuario", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_USUARIOS))]
+        [SAPField(FieldDescription = "Código usuario", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_LIST_USUARIOS))]
         public string U_MSS_COUS { get; set; }
 
-        [SAPField(FieldDescription = "Código almacén", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_ALMACENES))]
+        [SAPField(FieldDescription = "Código almacén", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_LIST_ALMACENES))]
         public string U_MSS_COAL { get; set; }
 
         [SAPField(FieldDescription = "Permiso estado pendiente", ValidValues = new[] { "Y", "N" }, ValidDescription = new[] { "Si", "No" }, DefaultValue = "N")]

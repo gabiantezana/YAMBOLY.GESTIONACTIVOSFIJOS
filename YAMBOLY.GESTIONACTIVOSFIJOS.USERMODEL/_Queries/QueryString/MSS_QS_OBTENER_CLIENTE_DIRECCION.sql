@@ -1,0 +1,1 @@
+﻿SELECT TOP 1 * FROM "CRD1" WHERE "CardCode" = 'PARAM1' AND "Address" = 'PARAM2'

@@ -27,10 +27,10 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
             ValidDescription = new[] { ESTADO.PENDIENTE.VALUE, ESTADO.LEGALIZADO.VALUE, ESTADO.IMPRESO.VALUE, ESTADO.RECHAZADO.VALUE })]
         public static string U_MSS_ESTA { get; set; }
 
-        [SAPField(FieldDescription = "Almacén despacho", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_ALMACENES_PERMITIDOS))]
+        [SAPField(FieldDescription = "Almacén despacho", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_LIST_ALMACENES_PERMITIDOS))]
         public static string U_MSS_ADES { get; set; }
 
-        [SAPField(FieldDescription = "Moneda", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_MONEDAS))]
+        [SAPField(FieldDescription = "Moneda", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_LIST_MONEDAS))]
         public static string U_MSS_MONE { get; set; }
 
         [SAPField(FieldDescription = "Monto anulación contrato", FieldType = SAPbobsCOM.BoFieldTypes.db_Numeric, FieldSubType = SAPbobsCOM.BoFldSubTypes.st_Price)]
@@ -52,25 +52,25 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
 
         #region Datos de cliente
 
-        [SAPField(FieldDescription = "Código cliente", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_CLIENTES))]
+        [SAPField(FieldDescription = "Código cliente", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_LIST))]
         public static string U_MSS_CCOD { get; set; }
 
-        [SAPField(FieldDescription = "Nombre cliente")]
+        [SAPField(FieldDescription = "Nombre cliente", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_CARDNAME), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_CCOD))]
         public static string U_MSS_CNOM { get; set; }
 
-        [SAPField(FieldDescription = "RUC Cliente")]
+        [SAPField(FieldDescription = "RUC Cliente", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_LICTRADNUM), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_CCOD))]
         public static string U_MSS_CRUC { get; set; }
 
-        [SAPField(FieldDescription = "Código dirección fiscal cliente", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_DIRECCIONES_DESTINO))]
+        [SAPField(FieldDescription = "Código dirección fiscal cliente", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_ADDRESS_LIST))]
         public static string U_MSS_CDFI { get; set; }
 
-        [SAPField(FieldDescription = "Desc. dirección fiscal cliente")]
+        [SAPField(FieldDescription = "Desc. dirección fiscal cliente", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_ADDRESS_DESCRIPTION_U_MSS_CDFD), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_CDFI))]
         public static string U_MSS_CDFD { get; set; }
 
-        [SAPField(FieldDescription = "Código dirección entrega cliente", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_DIRECCIONES_DESTINO))]
+        [SAPField(FieldDescription = "Código dirección entrega cliente", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_ADDRESS_LIST))]
         public static string U_MSS_CDEN { get; set; }
 
-        [SAPField(FieldDescription = "Desc. dirección entrega cliente")]
+        [SAPField(FieldDescription = "Desc. dirección entrega cliente", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_ADDRESS_DESCRIPTION_U_MSS_CDED), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_CDEN))]
         public static string U_MSS_CDED { get; set; }
 
         [SAPField(FieldDescription = "Partida electrónica cliente")]
@@ -83,32 +83,32 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
 
         #region Datos de representante
 
-        [SAPField(FieldDescription = "Código representante", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_PERSONAS_CONTACTO))]
+        [SAPField(FieldDescription = "Código representante", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_CONTACTPERSON_LIST))]
         public static string U_MSS_RCOD { get; set; }
 
-        [SAPField(FieldDescription = "Nombre representante")]
+        [SAPField(FieldDescription = "Nombre representante", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_CONTACTPERSON_NAME_U_MSS_RNOM), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_RCOD))]
         public static string U_MSS_RNOM { get; set; }
 
-        [SAPField(FieldDescription = "DNI representante")]
+        [SAPField(FieldDescription = "DNI representante", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_CONTACTPERSON_DNI_U_MSS_RDNI), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_RCOD))]
         public static string U_MSS_RDNI { get; set; }
 
-        [SAPField(FieldDescription = "Dirección representante")]
+        [SAPField(FieldDescription = "Dirección representante", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_CONTACTPERSON_ADDRESS_U_MSS_RDIR), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_RCOD))]
         public static string U_MSS_RDIR { get; set; }
 
         #endregion
 
         #region Datos de depositario
 
-        [SAPField(FieldDescription = "Código depositario", FormattedSearchType = typeof(MSS_GESTION_ACTIVOS_FIJOS.MSS_FS_LISTAR_PERSONAS_CONTACTO))] 
+        [SAPField(FieldDescription = "Código depositario", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_CONTACTPERSON_LIST))] 
         public static string U_MSS_DCOD { get; set; }
 
-        [SAPField(FieldDescription = "Nombre depositario")]
+        [SAPField(FieldDescription = "Nombre depositario", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_CONTACTPERSON_NAME_U_MSS_DNOM), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_DCOD))]
         public static string U_MSS_DNOM { get; set; }
 
-        [SAPField(FieldDescription = "DNI depositario")]
+        [SAPField(FieldDescription = "DNI depositario", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_CONTACTPERSON_DNI_U_MSS_DDNI), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_DCOD))]
         public static string U_MSS_DDNI { get; set; }
 
-        [SAPField(FieldDescription = "Dirección depositario")]
+        [SAPField(FieldDescription = "Dirección depositario", FormattedSearchType = typeof(ACCTIVOSFIJOS3.MSS_FS_GET_BP_CONTACTPERSON_ADDRESS_U_MSS_DDIR), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_DCOD))]
         public static string U_MSS_DDIR { get; set; }
 
         #endregion
@@ -144,7 +144,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
 
         public static class TIPO
         {
-            public static class COMODATO { public const string KEY = "CO"; public const string VALUE = "Comodato"; }
+            public static class COMODATO { public const string KEY = "COMODATO"; public const string VALUE = "Comodato"; }
             public static class DISTRIBUCION { public const string KEY = "DISTRIBUCION"; public const string VALUE = "Distribución"; }
         }
 

@@ -11,27 +11,97 @@ namespace SAPADDON.USERMODEL._FormattedSearches
     public class Queries
     {
         [QueryCategory]
-        public class MSS_GESTION_ACTIVOS_FIJOS//todo: cambiar el nombre
-
+        public class ACCTIVOSFIJOS3//todo: cambiar el nombre
         {
             [Query]
-            public static class MSS_FS_LISTAR_SERIES_ENTREGA { }
+            public static class MSS_FS_LIST_SERIES_ENTREGA { }
+
             [Query]
-            public static class MSS_FS_LISTAR_SERIES_DEVOLUCION { }
+            public static class MSS_FS_LIST_SERIES_DEVOLUCION { }
+
             [Query]
-            public static class MSS_FS_LISTAR_ALMACENES { }
+            public static class MSS_FS_LIST_ALMACENES { }
+
             [Query]
-            public static class MSS_FS_LISTAR_ALMACENES_PERMITIDOS { }
+            public static class MSS_FS_LIST_ALMACENES_PERMITIDOS { }
+
             [Query]
-            public static class MSS_FS_LISTAR_USUARIOS { }
+            public static class MSS_FS_LIST_USUARIOS { }
+
             [Query]
-            public static class MSS_FS_LISTAR_CLIENTES { }
+            public static class MSS_FS_LIST_MONEDAS { }
+
+            #region Clientes
+
             [Query]
-            public static class MSS_FS_LISTAR_MONEDAS { }
+            public static class MSS_FS_GET_BP_LIST { }
+
             [Query]
-            public static class MSS_FS_LISTAR_DIRECCIONES_DESTINO { }
+            public static class MSS_FS_GET_BP_CARDNAME { }
+
             [Query]
-            public static class MSS_FS_LISTAR_PERSONAS_CONTACTO { }
+            public static class MSS_FS_GET_BP_LICTRADNUM { }
+
+            #region Direcciones
+
+            [Query]
+            public static class MSS_FS_GET_BP_ADDRESS_LIST { }
+
+            [Query]
+            public static class MSS_FS_GET_BP_ADDRESS_DESCRIPTION_U_MSS_CDFD { }
+
+            [Query]
+            public static class MSS_FS_GET_BP_ADDRESS_DESCRIPTION_U_MSS_CDED { }
+
+            #endregion
+
+            #region Personas de contacto
+
+            [Query]
+            public static class MSS_FS_GET_BP_CONTACTPERSON_LIST { }
+
+            [Query]
+            public static class MSS_FS_GET_BP_CONTACTPERSON_NAME_U_MSS_RNOM { }
+
+            [Query]
+            public static class MSS_FS_GET_BP_CONTACTPERSON_NAME_U_MSS_DNOM { }
+
+            [Query]
+            public static class MSS_FS_GET_BP_CONTACTPERSON_DNI_U_MSS_RDNI { }
+
+            [Query]
+            public static class MSS_FS_GET_BP_CONTACTPERSON_DNI_U_MSS_DDNI { }
+
+            [Query]
+            public static class MSS_FS_GET_BP_CONTACTPERSON_ADDRESS_U_MSS_RDIR { }
+
+            [Query]
+            public static class MSS_FS_GET_BP_CONTACTPERSON_ADDRESS_U_MSS_DDIR { }
+
+
+            #endregion
+
+            #endregion
+
+            #region Document Lines
+
+            [Query]
+            public static class MSS_FS_GET_OITM_LIST { }
+
+            [Query]
+            public static class MSS_FS_GET_OITM_ITEMCODE { }
+
+            [Query]
+            public static class MSS_FS_GET_OITM_ITEMNAME { }
+            #endregion
+
         }
+
+        #region Internal Queries
+
+        public static class MSS_QS_OBTENER_CLIENTE { }
+        public static class MSS_QS_OBTENER_CLIENTE_DIRECCION { }
+
+        #endregion
     }
 }

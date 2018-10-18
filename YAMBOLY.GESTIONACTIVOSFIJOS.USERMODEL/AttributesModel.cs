@@ -71,6 +71,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public string FormattedSearchName { get; set; }
         public string FormattedSearchCategory { get; set; }
         public Type FormattedSearchType { get; set; }
+        public bool ForceRefresh { get; set; }
+        public string ParentFieldOnChange { get; set; }
     }
 
     internal class SAPUDOAttribute : Attribute

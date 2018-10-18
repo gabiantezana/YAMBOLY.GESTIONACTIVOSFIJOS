@@ -1,0 +1,1 @@
+﻿SELECT TOP 1 "CardName", "LicTradNum", * FROM "OCRD" WHERE "CardCode" = 'PARAM1'

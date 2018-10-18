@@ -181,64 +181,81 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
 
         private void DefineSAPUDOsAndFormattedSearchFields(String containingFolderName = null)
         {
-            try
+            IEnumerable<Type> udoTypes = Assembly.GetExecutingAssembly().GetTypes().Where(x => (x.GetAttributeValue((SAPUDOAttribute att) => att != null)));
+            foreach (Type udoType in udoTypes)
             {
-                IEnumerable<Type> udoTypes = Assembly.GetExecutingAssembly().GetTypes().Where(x => (x.GetAttributeValue((SAPUDOAttribute att) => att != null)));
-                foreach (Type udoType in udoTypes)
+                SAPUDOEntity udo = new SAPUDOEntity();
+                udo.Code = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType.Name);
+                udo.Name = udoType.GetAttributeValue((SAPUDOAttribute att) => att.Name);
+                udo.HeaderTableName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType.Name);
+                udo.FindColumns = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                                    .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSearchField)).Select(y => y.Name).ToArray();
+                udo.ChildTableNameList = udoType.GetAttributeValue((SAPUDOAttribute attr) => attr.ChildTableTypeList).Select(y => y.Name).ToArray();
+                udo.ObjectType = udoType.GetAttributeValue((SAPUDOAttribute att) => att.ObjectType);
+                udo.CanCancel = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanCancel);
+                udo.CanCreateDefaultForm = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanCreateDefaultForm);
+                udo.CanClose = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanClose);
+                udo.CanDelete = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanDelete);
+                udo.CanFind = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanFind);
+                udo.CanLog = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanLog);
+                udo.ChildFormColumns = udoType.GetAttributeValue((SAPUDOAttribute att) => att.ChildFormColumns);
+                udo.EnableEnhancedForm = udoType.GetAttributeValue((SAPUDOAttribute att) => att.EnableEnhancedForm);
+                udo.FormColumnsName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.FormColumns);
+
+                if (udo.CanCreateDefaultForm == BoYesNoEnum.tYES)
                 {
-                    SAPUDOEntity udo = new SAPUDOEntity();
-                    udo.Code = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType.Name);
-                    udo.Name = udoType.GetAttributeValue((SAPUDOAttribute att) => att.Name);
-                    udo.HeaderTableName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType.Name);
-                    udo.FindColumns = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
-                                        .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSearchField)).Select(y => y.Name).ToArray();
-                    udo.ChildTableNameList = udoType.GetAttributeValue((SAPUDOAttribute attr) => attr.ChildTableTypeList).Select(y => y.Name).ToArray();
-                    udo.ObjectType = udoType.GetAttributeValue((SAPUDOAttribute att) => att.ObjectType);
-                    udo.CanCancel = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanCancel);
-                    udo.CanCreateDefaultForm = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanCreateDefaultForm);
-                    udo.CanClose = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanClose);
-                    udo.CanDelete = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanDelete);
-                    udo.CanFind = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanFind);
-                    udo.CanLog = udoType.GetAttributeValue((SAPUDOAttribute att) => att.CanLog);
-                    udo.ChildFormColumns = udoType.GetAttributeValue((SAPUDOAttribute att) => att.ChildFormColumns);
-                    udo.EnableEnhancedForm = udoType.GetAttributeValue((SAPUDOAttribute att) => att.EnableEnhancedForm);
-                    udo.FormColumnsName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.FormColumns);
+                    var userFieldsName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                        .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ShowFieldInDefaultForm && attr2.IsSystemField == false)).Select(y => y.Name).ToArray();
 
-                    if (udo.CanCreateDefaultForm == BoYesNoEnum.tYES)
+                    var defaultFields = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                        .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ShowFieldInDefaultForm && attr2.IsSystemField)).Select(y => y.Name).ToArray();
+
+                    var userFieldsDescription = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                        .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ShowFieldInDefaultForm)).Select(y => y.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FieldDescription)).ToArray();
+
+                    udo.FormColumnsName = defaultFields.Concat(userFieldsName).ToArray();
+                    udo.FormColumnsDescription = userFieldsDescription;
+                }
+
+                if (udo.CanFind == BoYesNoEnum.tYES)
+                {
+                    var userFieldsName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                        .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSearchField && attr2.IsSystemField == false)).Select(y => y.Name).ToArray();
+
+                    var defaultFields = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                        .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSearchField && attr2.IsSystemField)).Select(y => y.Name).ToArray();
+
+                    udo.FindColumns = defaultFields.Concat(userFieldsName).ToArray();
+                }
+
+                udo.ManageSeries = udoType.GetAttributeValue((SAPUDOAttribute att) => att.ManageSeries);
+                udo.RebuildEnhancedForm = udoType.GetAttributeValue((SAPUDOAttribute att) => att.RebuildEnhancedForm);
+                _Schema.UDOList.Add(udo);
+
+                //----------------------------------------------------DEFINE CAMPOS ASOCIADOS A BÚSQUEDAS FORMATEADAS------------------------------------------------------
+                var list = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
+                                    .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType != null)).Select(y => y).ToList();
+                foreach (var item in list)
+                {
+                    var queryListType = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType).ReflectedType;//Base type to get the parent class of query than contains queryCategory
+                    _Schema.FormattedSearchFieldList.Add(new SAPFormattedSearchEntity()
                     {
-                        var userFieldsName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
-                            .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ShowFieldInDefaultForm && attr2.IsSystemField == false)).Select(y => y.Name).ToArray();
+                        FieldId = item.Name,
+                        FormId = udo.Code,
+                        QueryCategory = queryListType.Name,
+                        QueryName = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType).Name,
+                        ForceRefreshing = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ForceRefresh),
+                        ParentFieldOnChange = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ParentFieldOnChange),
+                    });
+                };
+                //CHILD TABLES
+                foreach (var childType in udoType.GetAttributeValue((SAPUDOAttribute att) => att.ChildTableTypeList))
+                {
 
-                        var defaultFields = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
-                            .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ShowFieldInDefaultForm && attr2.IsSystemField)).Select(y => y.Name).ToArray();
+                    var list2 = childType.GetProperties()
+                                 .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType != null)).Select(y => y).ToList();
 
-                        var userFieldsDescription = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
-                            .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ShowFieldInDefaultForm)).Select(y => y.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FieldDescription)).ToArray();
-
-                        udo.FormColumnsName = defaultFields.Concat(userFieldsName).ToArray();
-                        udo.FormColumnsDescription = userFieldsDescription;
-                    }
-
-                    if (udo.CanFind == BoYesNoEnum.tYES)
-                    {
-                        var userFieldsName = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
-                            .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSearchField && attr2.IsSystemField == false)).Select(y => y.Name).ToArray();
-
-                        var defaultFields = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
-                            .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.IsSearchField && attr2.IsSystemField)).Select(y => y.Name).ToArray();
-
-                        udo.FindColumns = defaultFields.Concat(userFieldsName).ToArray();
-                    }
-
-                    udo.ManageSeries = udoType.GetAttributeValue((SAPUDOAttribute att) => att.ManageSeries);
-                    udo.RebuildEnhancedForm = udoType.GetAttributeValue((SAPUDOAttribute att) => att.RebuildEnhancedForm);
-                    _Schema.UDOList.Add(udo);
-
-                    //----------------------------------------------------DEFINE CAMPOS ASOCIADOS A BÚSQUEDAS FORMATEADAS------------------------------------------------------
-                    var list = udoType.GetAttributeValue((SAPUDOAttribute att) => att.HeaderTableType).GetProperties()
-                                        .Where(z => z.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType != null)).Select(y => y).ToArray();
-
-                    foreach (var item in list)
+                    foreach (var item in list2)
                     {
                         var queryListType = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType).ReflectedType;//Base type to get the parent class of query than contains queryCategory
                         _Schema.FormattedSearchFieldList.Add(new SAPFormattedSearchEntity()
@@ -246,16 +263,18 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
                             FieldId = item.Name,
                             FormId = udo.Code,
                             QueryCategory = queryListType.Name,
-                            QueryName = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType).Name
+                            QueryName = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType).Name,
+                            ForceRefreshing = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ForceRefresh),
+                            ParentFieldOnChange = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ParentFieldOnChange),
+                            IsChildTable = true,
                         });
                     };
-                    //----------------------------------------------------DEFINE CAMPOS ASOCIADOS A BÚSQUEDAS FORMATEADAS------------------------------------------------------
-
                 }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error creating udo schema: ", ex);
+
+
+
+                //----------------------------------------------------DEFINE CAMPOS ASOCIADOS A BÚSQUEDAS FORMATEADAS------------------------------------------------------
+
             }
 
         }
