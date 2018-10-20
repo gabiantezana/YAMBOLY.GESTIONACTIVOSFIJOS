@@ -1,0 +1,1 @@
+﻿SELECT * FROM "@MSS_CONT" WHERE "DocEntry" = 'PARAM1'

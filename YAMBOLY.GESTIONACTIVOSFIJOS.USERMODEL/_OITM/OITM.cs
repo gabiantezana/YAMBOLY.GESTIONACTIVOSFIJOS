@@ -25,42 +25,44 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._OITM
                                                ValidValues.MSS_EAAF.DeBaja.DESCRIPTION
                                               }
                   )]
-        public static string MSS_EAAF { get; set; }
-    }
+        public static string MSS_EAAF { get; set; }//TODO: SAP ESTÁ CREANDO EL NOMBRE VACÍO
 
-    public static class ValidValues
-    {
-        public class MSS_EAAF
+        public static class ValidValues
         {
-            public static class Disponible
+            public class MSS_EAAF
             {
-                public const string ID = "01";
-                public const string DESCRIPTION = "Disponible";
-            }
+                public static class Disponible
+                {
+                    public const string ID = "01";
+                    public const string DESCRIPTION = "Disponible";
+                }
 
-            public static class Reservado
-            {
-                public const string ID = "02";
-                public const string DESCRIPTION = "Reservado";
-            }
+                public static class Reservado
+                {
+                    public const string ID = "02";
+                    public const string DESCRIPTION = "Reservado";
+                }
 
-            public static class Asignado
-            {
-                public const string ID = "03";
-                public const string DESCRIPTION = "Asignado";
-            }
+                public static class Asignado
+                {
+                    public const string ID = "03";
+                    public const string DESCRIPTION = "Asignado";
+                }
 
-            public static class EnMantenimiento
-            {
-                public const string ID = "04";
-                public const string DESCRIPTION = "En mantenimiento";
-            }
+                public static class EnMantenimiento
+                {
+                    public const string ID = "04";
+                    public const string DESCRIPTION = "En mantenimiento";
+                }
 
-            public static class DeBaja
-            {
-                public const string ID = "05";
-                public const string DESCRIPTION = "De baja";
+                public static class DeBaja
+                {
+                    public const string ID = "05";
+                    public const string DESCRIPTION = "De baja";
+                }
             }
         }
     }
+
+   
 }

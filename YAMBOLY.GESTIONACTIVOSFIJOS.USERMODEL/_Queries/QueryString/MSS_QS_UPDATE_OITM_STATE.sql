@@ -1,0 +1,3 @@
+﻿UPDATE "OITM" 
+SET "U_MSS_EAAF" = 'PARAM2'
+WHERE "ItemCode" = 'PARAM1'

@@ -121,10 +121,7 @@
     <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LIST_SERIES_ENTREGA.sql" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_OBTENER_CLIENTE.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_OBTENER_CLIENTE_DIRECCION.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_UPDATE_OITM_STATE.sql" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_CARDNAME.sql" />
@@ -164,6 +161,18 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_OITM_ITEMNAME.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_OITM_VALORADQUISICION.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_GET_CONTRATO.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_GET_PERMISO_ALMACEN_ESTADO - Copy.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_GET_CONTRATO_LINES.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

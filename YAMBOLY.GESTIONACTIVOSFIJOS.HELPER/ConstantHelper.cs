@@ -15,6 +15,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
         public static String DEFAULTDATENULL = "30/12/1899 00:00:00";
         public static string PARAM1 = "PARAM1";
         public static string PARAM2 = "PARAM2";
+        public static string PARAM3 = "PARAM3";
         public const string PARENTPERMISSIONKEY = "MSS_PERM_PLANIF";
         public const string PARENTPERMISSIONNAME = "AddOn Planificación de Despachos";
         public const string DEFAULT_SAP_SUCCESSBUTTON = "1";

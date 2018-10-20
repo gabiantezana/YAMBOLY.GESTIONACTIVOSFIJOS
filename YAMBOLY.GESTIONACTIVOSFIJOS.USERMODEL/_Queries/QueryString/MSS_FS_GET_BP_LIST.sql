@@ -1,1 +1,1 @@
-﻿SELECT "CardCode", "CardName" FROM "OCRD"
+﻿SELECT "CardCode", "CardName" FROM "OCRD" WHERE "CardType" = 'C'

@@ -10,6 +10,9 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
     public class MSS_CONT
     {
         [SAPField(IsSystemField = true)]
+        public static string DocEntry { get; set; }
+
+        [SAPField(IsSystemField = true)]
         public static string DocNum { get; set; }
 
         [SAPField(IsSystemField = true)]
@@ -139,7 +142,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
             public static class PENDIENTE { public const string KEY = "PENDIENTE"; public const string VALUE = "Pendiente"; }
             public static class IMPRESO { public const string KEY = "IMPRESO"; public const string VALUE = "Impreso"; }
             public static class LEGALIZADO { public const string KEY = "LEGALIZADO"; public const string VALUE = "Legalizado"; }
-            public static class RECHAZADO { public const string KEY = "RECHAZADOMODATO"; public const string VALUE = "Rechazado"; }
+            public static class RECHAZADO { public const string KEY = "RECHAZADo"; public const string VALUE = "Rechazado"; }
         }
 
         public static class TIPO

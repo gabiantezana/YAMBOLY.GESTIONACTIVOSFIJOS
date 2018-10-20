@@ -11,6 +11,7 @@ using static YAMBOLY.GESTIONACTIVOSFIJOS.HELPER.ConstantHelper;
 using SAPADDON.USERMODEL._Menu;
 using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFSE;
 using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CFSEForm;
+using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT;
 
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 {
@@ -181,6 +182,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 
             eventFilter = FilterList.Add(SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED);
             eventFilter.AddEx(nameof(MSS_CFSE));
+            eventFilter.AddEx(nameof(MSS_CONT));
+
             /*
             eventFilter.AddEx(FormID.MSS_VEHI.IdToString());
             eventFilter.AddEx(FormID.MSS_DESP.IdToString());
@@ -198,6 +201,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             eventFilter.AddEx(FormID.MSS_ASUU.IdToString());*/
 
             eventFilter = FilterList.Add(SAPbouiCOM.BoEventTypes.et_COMBO_SELECT);
+            eventFilter.AddEx(nameof(MSS_CONT));
             eventFilter.AddEx(nameof(MSS_CFSE));
             /*
             eventFilter.AddEx(FormID.MSS_DESP.IdToString());
@@ -209,7 +213,12 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             /*eventFilter.AddEx(FormID.MSS_DESP.IdToString());*/
 
             eventFilter = FilterList.Add(BoEventTypes.et_FORM_DATA_ADD);
+            eventFilter.AddEx(nameof(MSS_CONT));
             eventFilter.AddEx(nameof(MSS_CFSE));
+
+            eventFilter = FilterList.Add(BoEventTypes.et_FORM_DATA_UPDATE);
+            eventFilter.AddEx(nameof(MSS_CONT));
+
             /*eventFilter.AddEx(FormID.MSS_DESP.IdToString());*/
 
             eventFilter = FilterList.Add(BoEventTypes.et_FORM_CLOSE);
@@ -224,6 +233,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             /*eventFilter.AddEx(FormID.MSS_DESP_LIST.IdToString());*/
 
             eventFilter = FilterList.Add(BoEventTypes.et_FORM_DATA_LOAD);
+            eventFilter.AddEx(nameof(MSS_CONT));
             eventFilter.AddEx(nameof(MSS_CFSE));
             /*eventFilter.AddEx(FormID.MSS_DESP.IdToString());*/
 
@@ -280,6 +290,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
                             break;
 
                         default:
+                            if (GetFormOpenList().ContainsKey(GetActiveForm().UniqueID))
+                                GetFormOpenList()[GetActiveForm().UniqueID].HandleMenuDataEvents(menuEvent);
                             break;
                     }
                 }
@@ -305,6 +317,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             }
             catch (Exception ex)
             {
+                _bubbleEvent = false;
                 HandleApplicationException(ex);
             }
             finally

@@ -93,15 +93,23 @@ namespace SAPADDON.USERMODEL._FormattedSearches
 
             [Query]
             public static class MSS_FS_GET_OITM_ITEMNAME { }
+
+            [Query]
+            public static class MSS_FS_GET_OITM_VALORADQUISICION { }
+
             #endregion
 
         }
 
         #region Internal Queries
 
-        public static class MSS_QS_OBTENER_CLIENTE { }
-        public static class MSS_QS_OBTENER_CLIENTE_DIRECCION { }
+        public static class MSS_QS_GET_PERMISO_ALMACEN_ESTADO { }
 
+        public static class MSS_QS_GET_CONTRATO { }
+
+        public static class MSS_QS_GET_CONTRATO_LINES { }
+
+        public static class MSS_QS_UPDATE_OITM_STATE { }
         #endregion
     }
 }
