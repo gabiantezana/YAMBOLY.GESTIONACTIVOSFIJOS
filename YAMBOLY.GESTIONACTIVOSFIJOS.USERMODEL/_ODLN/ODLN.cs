@@ -10,12 +10,15 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._ODLN
     /// Tabla entrega por venta SAP
     /// </summary>
     [SAPTable(IsSystemTable = true)]
-    public static class ODLN
+    public class ODLN
     {
         [SAPField(FieldDescription = "Serie contrato")]
         public static string MSS_SECO { get; set; }
 
         [SAPField(FieldDescription = "Numero contrato")]
         public static string MSS_NUCO { get; set; }
+
+        [SAPField(IsSystemField = true)]
+        public static string U_MSSL_TOP { get; set; }
     }
 }

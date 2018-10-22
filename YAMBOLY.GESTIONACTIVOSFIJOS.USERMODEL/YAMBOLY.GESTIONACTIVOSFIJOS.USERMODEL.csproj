@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper\FileHelper.cs" />
+    <Compile Include="_DLN1\DLN1.cs" />
     <Compile Include="_Queries\Queries.cs" />
     <Compile Include="_Menu\_Menu.cs" />
     <Compile Include="_MSS_CONT\MSS_CONT.cs" />
@@ -169,10 +170,13 @@
     <EmbeddedResource Include="_Queries\QueryString\MSS_QS_GET_CONTRATO.sql" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_GET_PERMISO_ALMACEN_ESTADO - Copy.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_GET_PERMISO_ALMACEN_ESTADO.sql" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="_Queries\QueryString\MSS_QS_GET_CONTRATO_LINES.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_GET_MSS_CFSE.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

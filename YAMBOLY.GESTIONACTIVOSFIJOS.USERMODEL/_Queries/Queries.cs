@@ -105,11 +105,22 @@ namespace SAPADDON.USERMODEL._FormattedSearches
 
         public static class MSS_QS_GET_PERMISO_ALMACEN_ESTADO { }
 
+        /// <summary>
+        /// PARAM1: DocEntry
+        /// </summary>
         public static class MSS_QS_GET_CONTRATO { }
 
+        /// <summary>
+        /// PARAM1: DocEntry
+        /// </summary>
         public static class MSS_QS_GET_CONTRATO_LINES { }
 
         public static class MSS_QS_UPDATE_OITM_STATE { }
+
+        /// <summary>
+        /// PARAM1: Almacén
+        /// </summary>
+        public static class MSS_QS_GET_MSS_CFSE {}
         #endregion
     }
 }

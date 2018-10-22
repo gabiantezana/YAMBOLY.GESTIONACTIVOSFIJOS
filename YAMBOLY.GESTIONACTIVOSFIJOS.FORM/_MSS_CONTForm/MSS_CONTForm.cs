@@ -9,6 +9,9 @@ using SAPADDON.USERMODEL.Helper;
 using SAPADDON.USERMODEL._FormattedSearches;
 using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFPE;
 using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._OITM;
+using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._ODLN;
+using SAPADDON.USERMODEL._DLN1;
+using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFSE;
 
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 {
@@ -54,7 +57,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             _Form.EnableMenu(MENU_CANCELAR, false);
         }
 
-        private void EnableRightClickMenuItems()
+        private void EnableMenuItems()
         {
             switch ((GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Value)
             {
@@ -82,6 +85,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 
         private void SetEstadoAsPendiente()
         {
+            (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Item.Enabled = true;
             (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Select(MSS_CONT.ESTADO.PENDIENTE.KEY);
             (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Active = false;
             (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Item.Enabled = false;
@@ -121,6 +125,22 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 
         private bool BeforeSave()
         {
+            //-------------------------------------------Valida que el documento se pueda modificar--------------------------------------------
+            string currentState = (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Value.Trim();
+            switch (currentState)
+            {
+                case MSS_CONT.ESTADO.PENDIENTE.KEY:
+                case null:
+                case "":
+                    break;
+                case MSS_CONT.ESTADO.IMPRESO.KEY:
+                case MSS_CONT.ESTADO.RECHAZADO.KEY:
+                case MSS_CONT.ESTADO.LEGALIZADO.KEY:
+                default:
+                    throw new Exception("El documento no puede ser modificado con el estado actual.");
+            }
+
+
             var almacen = (GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)) as EditText).Value;
             if (string.IsNullOrEmpty(almacen))
                 throw new Exception("Seleccione el almacén");
@@ -191,8 +211,13 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
         {
             if (itemEvent.ItemUID == nameof(MSS_CONT.Series) && itemEvent.ActionSuccess && itemEvent.EventType == BoEventTypes.et_COMBO_SELECT)
                 LoadNumeration();
-            return true;
 
+            if (itemEvent.ItemUID == "1")
+            {
+                if (itemEvent.BeforeAction)
+                    return BeforeSave();
+            }
+            return true;
         }
         public bool HandleItemPressed(ItemEvent oEvent) { return true; }
         public bool HandleFormDataEvents(BusinessObjectInfo oBusinessObjectInfo)
@@ -201,54 +226,112 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             {
                 case BoEventTypes.et_FORM_DATA_ADD:
                 case BoEventTypes.et_FORM_DATA_UPDATE:
-                    if (oBusinessObjectInfo.BeforeAction)
-                        return BeforeSave();
                     break;
+
                 case BoEventTypes.et_FORM_DATA_LOAD:
                     if (oBusinessObjectInfo.ActionSuccess)
-                        EnableRightClickMenuItems();
+                        EnableMenuItems();
                     break;
             }
             return true;
         }
         public bool HandleMenuDataEvents(MenuEvent menuEvent)
         {
-            if (menuEvent.MenuUID == MenuUID.AddLine && !menuEvent.BeforeAction)
+            switch (menuEvent.MenuUID)
             {
-                // clean the DBDataSources associated to the matrix
-                _Form.DataSources.DBDataSources.Item(1).Clear();
+                case MenuUID.AddLine:
+                    if (!menuEvent.BeforeAction)
+                    {
+                        // clean the DBDataSources associated to the matrix
+                        _Form.DataSources.DBDataSources.Item(1).Clear();
 
-                // add the line to the matrix
-                int rowCount = GetMatrix().RowCount;
-                GetMatrix().AddRow(1, rowCount);
-                GetMatrix().SelectRow(1 + rowCount, true, false);
+                        // add the line to the matrix
+                        int rowCount = GetMatrix().RowCount;
+                        GetMatrix().AddRow(1, rowCount);
+                        GetMatrix().SelectRow(1 + rowCount, true, false);
 
-                //And to delete a line:
-                /*  nq33
-                int selRow = GetMatrix().GetNextSelectedRow(0, BoOrderType.ot_SelectionOrder);
-                if (selRow == -1)
-                    return false;
-                GetMatrix().DeleteRow(selRow);*/
-            }
-
-            else if (menuEvent.MenuUID == MENU_IMPRIMIR)
-            {
-                ShowAlert("Imprimir");
-            }
-
-            else if (menuEvent.MenuUID == MENU_CANCELAR)
-            {
-                ShowAlert("Cancelar");
-            }
-
-            else if (menuEvent.MenuUID == MENU_LEGALIZAR)
-            {
-                ShowAlert("Legalizar");
+                        //And to delete a line:
+                        /*  nq33
+                        int selRow = GetMatrix().GetNextSelectedRow(0, BoOrderType.ot_SelectionOrder);
+                        if (selRow == -1)
+                            return false;
+                        GetMatrix().DeleteRow(selRow);*/
+                    }
+                    break;
+                case MenuUID.MenuCrear:
+                    SetEstadoAsPendiente();
+                    break;
+                case MENU_IMPRIMIR:
+                    ShowAlert("Imprimir");
+                    break;
+                case MENU_CANCELAR:
+                    ShowAlert("Cancelar");
+                    break;
+                case MENU_LEGALIZAR:
+                    ShowAlert("Legalizar");
+                    break;
+                default:
+                    break;
             }
 
             return true;
         }
         public bool HandleRightClickEvent(ContextMenuInfo menuInfo) { return true; }
+
+        #endregion
+
+        #region CreateDocuments
+
+        private bool CreateDocument(int contratoDocEntry)
+        {
+
+            SAPbobsCOM.Documents document = GetCompany().GetBusinessObject(SAPbobsCOM.BoObjectTypes.oDeliveryNotes);
+            document.DocType = SAPbobsCOM.BoDocumentTypes.dDocument_Items;
+
+            var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO)).Replace(PARAM1, contratoDocEntry.ToString());
+            var rs = DoQuery(query);
+
+            var querySeries = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO)).Replace(PARAM1, contratoDocEntry.ToString());
+            var rsSeries = DoQuery(querySeries);
+            int serieDoc = rsSeries.Fields.Item(nameof(MSS_CFSE.U_MSS_SEEN)).Value;
+
+
+            document.CardCode = rs.Fields.Item(nameof(MSS_CONT.U_MSS_CCOD)).Value;
+            document.DocCurrency = rs.Fields.Item(nameof(MSS_CONT.U_MSS_MONE)).Value;
+            document.Series = serieDoc;
+            document.DocDate = DateTime.Now;
+            document.DocDueDate = DateTime.Now;
+            document.TaxDate = DateTime.Now;
+            document.Indicator = ConstantHelper.DeliveryNoteDefaultInfo.Indicator;
+            document.PayToCode = rs.Fields.Item(nameof(MSS_CONT.U_MSS_CDEN)).Value;
+            //TODO: ? CONDICIÓN DE PAGO
+
+            //CAMPOS DE USUARIO
+            document.UserFields.Fields.Item(nameof(ODLN.U_MSSL_TOP)).Value = ConstantHelper.DeliveryNoteDefaultInfo.U_MSSL_TOP;
+            document.UserFields.Fields.Item(nameof(ODLN.MSS_SECO)).Value = rs.Fields.Item(nameof(MSS_CONT.Series)).Value;
+            document.UserFields.Fields.Item(nameof(ODLN.MSS_NUCO)).Value = rs.Fields.Item(nameof(MSS_CONT.DocNum)).Value;
+
+            var queryLines = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO_LINES)).Replace(PARAM1, contratoDocEntry.ToString());
+            var rsLines = DoQuery(queryLines);
+            for (var i = 1; i <= rsLines.RecordCount; i++)
+            {
+                //DOCUMENT LINES
+                document.Lines.ItemCode = rsLines.Fields.Item(nameof(MSS_CONT_LINES.U_MSS_AFCO)).Value;
+                document.Lines.Price = 0.00;
+                document.Lines.TaxCode = ConstantHelper.DeliveryNoteDefaultInfo.TaxCode;
+                document.Lines.WarehouseCode = rs.Fields.Item(nameof(MSS_CONT.U_MSS_ADES)).Value;
+                document.Lines.UserFields.Fields.Item(nameof(DLN1.U_MSSL_CGP)).Value = ConstantHelper.DeliveryNoteDefaultInfo.Lines.U_MSSL_CGP;
+                document.Lines.UserFields.Fields.Item(nameof(DLN1.U_MSSL_CGD)).Value = ConstantHelper.DeliveryNoteDefaultInfo.Lines.U_MSSL_CGD;
+                document.Lines.WTLiable = SAPbobsCOM.BoYesNoEnum.tNO;
+                document.Lines.Add();
+                rs.MoveNext();
+            }
+
+
+            if (document.Add() == ConstantHelper.DefaulSuccessSAPNumber)
+                return true;
+            return false;
+        }
 
         #endregion
 

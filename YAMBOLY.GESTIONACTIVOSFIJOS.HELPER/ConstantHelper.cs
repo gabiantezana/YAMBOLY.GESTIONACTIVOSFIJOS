@@ -19,6 +19,19 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
         public const string PARENTPERMISSIONKEY = "MSS_PERM_PLANIF";
         public const string PARENTPERMISSIONNAME = "AddOn Planificación de Despachos";
         public const string DEFAULT_SAP_SUCCESSBUTTON = "1";
+        public const string DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+
+        public static class DeliveryNoteDefaultInfo
+        {
+            public const string U_MSSL_TOP = "99";
+            public const string Indicator = "09";
+            public const string TaxCode = "IGV";
+            public static class Lines
+            {
+                public const string U_MSSL_CGP = "000";
+                public const string U_MSSL_CGD = "000";
+            }
+        }
 
         public static class SAP_YES_NO
         {

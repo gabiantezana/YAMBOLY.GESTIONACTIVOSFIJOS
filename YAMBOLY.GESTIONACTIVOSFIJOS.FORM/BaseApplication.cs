@@ -322,7 +322,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             }
             finally
             {
-                GC.Collect();
+                    GC.Collect();
                 BubbleEvent = _bubbleEvent;
             }
         }
@@ -336,7 +336,9 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
                     _bubbleEvent = GetFormOpenList()[BusinessObjectInfo.FormUID].HandleFormDataEvents(BusinessObjectInfo);
             }
             catch (Exception ex)
+
             {
+                _bubbleEvent = false;
                 HandleApplicationException(ex);
             }
             finally
@@ -458,4 +460,3 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
         #endregion
     }
 }
-

@@ -150,7 +150,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
 
                     foreach (var itemType in type.GetProperties())
                     {
-                        if (!itemType.GetAttributeValue((SAPFieldAttribute att) => att.IsSystemField))
+                        if (itemType.GetAttributeValue((SAPFieldAttribute att) => att.IsSystemField) == false)
                         {
                             SAPFieldEntity userField = new SAPFieldEntity
                             {
