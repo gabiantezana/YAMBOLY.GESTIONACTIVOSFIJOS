@@ -118,9 +118,21 @@ namespace SAPADDON.USERMODEL._FormattedSearches
         public static class MSS_QS_UPDATE_OITM_STATE { }
 
         /// <summary>
+        /// Actualiza estado de contrato
+        /// Params{ PARAM1: DocEntry, PARAM2: NewStateId }
+        /// </summary>
+        public static class MSS_QS_UPDATE_CONT_STATE { }
+
+        /// <summary>
+        /// Obtener configuración de series por almacén
         /// PARAM1: Almacén
         /// </summary>
-        public static class MSS_QS_GET_MSS_CFSE {}
+        public static class MSS_QS_GET_MSS_CFSE { }
+
+        /// <summary>
+        /// PARAM1: MSS_CONT.Series, PARAM2: MSS_CONT.DocNum
+        /// </summary>
+        public static class MSS_QS_GET_RELATED_DELIVERY { }
         #endregion
     }
 }

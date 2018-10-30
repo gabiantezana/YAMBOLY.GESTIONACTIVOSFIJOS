@@ -12,6 +12,7 @@ using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._OITM;
 using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._ODLN;
 using SAPADDON.USERMODEL._DLN1;
 using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFSE;
+using YAMBOLY.GESTIONACTIVOSFIJOS.EXCEPTION;
 
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 {
@@ -48,37 +49,57 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             oCreationPackage.String = MENU_LEGALIZAR_CAPTION;
             _Form.Menu.AddEx(oCreationPackage);
 
-            oCreationPackage.UniqueID = MENU_CANCELAR;
-            oCreationPackage.String = MENU_CANCELAR_CAPTION;
+            oCreationPackage.UniqueID = MENU_RECHAZAR;
+            oCreationPackage.String = MENU_RECHAZAR_CAPTION;
             _Form.Menu.AddEx(oCreationPackage);
 
             _Form.EnableMenu(MENU_IMPRIMIR, false);
             _Form.EnableMenu(MENU_LEGALIZAR, false);
-            _Form.EnableMenu(MENU_CANCELAR, false);
+            _Form.EnableMenu(MENU_RECHAZAR, false);
         }
 
         private void EnableMenuItems()
         {
+            _Form.Items.Item("3").Visible = false;
+            _Form.EnableMenu(MENU_IMPRIMIR, false);
+            _Form.EnableMenu(MENU_LEGALIZAR, false);
+            _Form.EnableMenu(MENU_RECHAZAR, false);
+
             switch ((GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Value)
             {
                 case MSS_CONT.ESTADO.PENDIENTE.KEY:
                     _Form.EnableMenu(MENU_IMPRIMIR, true);
-                    _Form.EnableMenu(MENU_LEGALIZAR, false);
-                    _Form.EnableMenu(MENU_CANCELAR, true);
+                    _Form.EnableMenu(MENU_RECHAZAR, true);
                     break;
 
                 case MSS_CONT.ESTADO.IMPRESO.KEY:
-                    _Form.EnableMenu(MENU_IMPRIMIR, false);
                     _Form.EnableMenu(MENU_LEGALIZAR, true);
-                    _Form.EnableMenu(MENU_CANCELAR, true);
+                    _Form.EnableMenu(MENU_RECHAZAR, true);
                     break;
 
                 case MSS_CONT.ESTADO.RECHAZADO.KEY:
+                    break;
                 case MSS_CONT.ESTADO.LEGALIZADO.KEY:
+                    //---------------------- Lógica para habilitar botón de Concesión------------------------ 
+                    var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_RELATED_DELIVERY));
+                    var series = (GetItemEspecific(nameof(MSS_CONT.Series)) as ComboBox)?.Value;
+                    var docNum = (GetItemEspecific(nameof(MSS_CONT.DocNum)) as EditText)?.Value;
+                    query = query.Replace(PARAM1, series)
+                                .Replace(PARAM2, docNum);
+
+                    if (DoQuery(query).RecordCount > 0)//Tiene una o más entregas asociadas
+                    {
+                        (_Form.Items.Item("3").Specific as Button).Caption = "Retorno";
+                        _Form.Items.Item("3").Visible = true;
+                    }
+                    else//No tiene ninguna entrega asociada
+                    {
+                        (_Form.Items.Item("3").Specific as Button).Caption = "Concesión";
+                        _Form.Items.Item("3").Visible = true;
+                    }
+                    break;
+                //------------------------------------------------------------------------------------------- 
                 default:
-                    _Form.EnableMenu(MENU_IMPRIMIR, false);
-                    _Form.EnableMenu(MENU_LEGALIZAR, false);
-                    _Form.EnableMenu(MENU_CANCELAR, false);
                     break;
             }
         }
@@ -201,6 +222,65 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 
         #region Queries
 
+        private bool UserHasPermission(string warehouse, string state)
+        {
+            string columnName = null;
+            switch (state)
+            {
+                case MSS_CONT.ESTADO.PENDIENTE.KEY:
+                    columnName = nameof(MSS_CFPE.U_MSS_PEPE);
+                    break;
+                case MSS_CONT.ESTADO.IMPRESO.KEY:
+                    columnName = nameof(MSS_CFPE.U_MSS_PEIM);
+                    break;
+                case MSS_CONT.ESTADO.LEGALIZADO.KEY:
+                    columnName = nameof(MSS_CFPE.U_MSS_PELE);
+                    break;
+                case MSS_CONT.ESTADO.RECHAZADO.KEY:
+                    columnName = nameof(MSS_CFPE.U_MSS_PERE);
+                    break;
+                default:
+                    throw new Exception("No se reconoce el estado: " + state);
+            }
+
+            var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_PERMISO_ALMACEN_ESTADO));
+            query = query.Replace(PARAM1, GetCompany().UserName).Replace(PARAM2, warehouse);
+            query = query.Replace(PARAM3, columnName);
+            if (DoQuery(query).RecordCount == 0)
+                return false;
+
+            return true;
+        }
+
+        private void UpdateContState(string docEntry, string newState)
+        {
+            string wareHouseCode = GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value;
+            if (!UserHasPermission(wareHouseCode, newState)) throw new CustomException("El usuario no tiene permiso para cambiar el estado");
+            var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_UPDATE_CONT_STATE)).Replace(PARAM1, docEntry).Replace(PARAM2, newState);
+            switch (newState)
+            {
+                case MSS_CONT.ESTADO.PENDIENTE.KEY:
+                    break;
+                case MSS_CONT.ESTADO.IMPRESO.KEY:
+                    DoQuery(query);
+                    GetApplication().ActivateMenuItem(MenuUID.RegistroActualizar);
+                    //TODO: Implementar lógica de impresión
+                    break;
+                case MSS_CONT.ESTADO.LEGALIZADO.KEY:
+                    DoQuery(query);
+                    GetApplication().ActivateMenuItem(MenuUID.RegistroActualizar);
+                    break;
+                case MSS_CONT.ESTADO.RECHAZADO.KEY:
+                    //TODO: Implementar lógica de rechazo
+                    DoQuery(query);
+                    GetApplication().ActivateMenuItem(MenuUID.RegistroActualizar);
+                    break;
+                default:
+                    break;
+            }
+
+            DoQuery(query);
+        }
 
 
         #endregion
@@ -212,11 +292,15 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             if (itemEvent.ItemUID == nameof(MSS_CONT.Series) && itemEvent.ActionSuccess && itemEvent.EventType == BoEventTypes.et_COMBO_SELECT)
                 LoadNumeration();
 
-            if (itemEvent.ItemUID == "1")
+            else if (itemEvent.ItemUID == "1" && itemEvent.BeforeAction)
+                return BeforeSave();
+
+            else if (itemEvent.ItemUID == "3" && itemEvent.ActionSuccess)
             {
-                if (itemEvent.BeforeAction)
-                    return BeforeSave();
+                if (GetApplication().MessageBox("Se procederá a realizar la concesión temporal del activo fijo. Desea continuar?", 1, "Sí", "No") == 1)
+                    CreateDocument(2);
             }
+
             return true;
         }
         public bool HandleItemPressed(ItemEvent oEvent) { return true; }
@@ -226,6 +310,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             {
                 case BoEventTypes.et_FORM_DATA_ADD:
                 case BoEventTypes.et_FORM_DATA_UPDATE:
+
                     break;
 
                 case BoEventTypes.et_FORM_DATA_LOAD:
@@ -262,13 +347,13 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
                     SetEstadoAsPendiente();
                     break;
                 case MENU_IMPRIMIR:
-                    ShowAlert("Imprimir");
+                    UpdateContState(GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value, MSS_CONT.ESTADO.IMPRESO.KEY);
                     break;
-                case MENU_CANCELAR:
-                    ShowAlert("Cancelar");
+                case MENU_RECHAZAR:
+                    UpdateContState(GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value, MSS_CONT.ESTADO.RECHAZADO.KEY);
                     break;
                 case MENU_LEGALIZAR:
-                    ShowAlert("Legalizar");
+                    UpdateContState(GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value, MSS_CONT.ESTADO.LEGALIZADO.KEY);
                     break;
                 default:
                     break;
@@ -281,24 +366,40 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
         #endregion
 
         #region CreateDocuments
-
-        private bool CreateDocument(int contratoDocEntry)
+        private void CreateDocuments()
         {
+            var codigoAlmacen = (GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)) as EditText).Value;
+            var docEntry = (GetItemEspecific(nameof(MSS_CONT.DocEntry)) as EditText).Value;
+            var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_MSS_CFSE)).Replace(ConstantHelper.PARAM1, codigoAlmacen);
+
+            var maxDocumentLines = Convert.ToInt32(DoQuery(query).Fields.Item(nameof(MSS_CFSE.U_MSS_NULI))?.Value ?? 0);
+            if (maxDocumentLines < 1)
+                throw new CustomException("No se ha definido el número máximo de líneas para este almacén en la configuración de series por almacén.");
+
+
+        }
+
+
+        int registeredDocumentLines = 0;
+        private void CreateDocument(int maxDocumentLines)
+        {
+            var query_ = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_RELATED_DELIVERY)).Replace(PARAM1, (GetItemEspecific(nameof(MSS_CONT.Series)) as ComboBox).Value).Replace(PARAM2, (GetItemEspecific(nameof(MSS_CONT.DocNum)) as EditText).Value);
+            if (DoQuery(query_).RecordCount > 0)
+                throw new Exception("Ya se generó una cesión temporal para este documento.");
+
+            var docEntry = (GetItemEspecific(nameof(MSS_CONT.DocEntry)) as EditText).Value;
 
             SAPbobsCOM.Documents document = GetCompany().GetBusinessObject(SAPbobsCOM.BoObjectTypes.oDeliveryNotes);
             document.DocType = SAPbobsCOM.BoDocumentTypes.dDocument_Items;
 
-            var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO)).Replace(PARAM1, contratoDocEntry.ToString());
+            var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO)).Replace(PARAM1, docEntry.ToString());
             var rs = DoQuery(query);
 
-            var querySeries = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO)).Replace(PARAM1, contratoDocEntry.ToString());
-            var rsSeries = DoQuery(querySeries);
-            int serieDoc = rsSeries.Fields.Item(nameof(MSS_CFSE.U_MSS_SEEN)).Value;
-
+            var querySeries = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_MSS_CFSE)).Replace(PARAM1, rs.Fields.Item(nameof(MSS_CONT.U_MSS_ADES)).Value);
 
             document.CardCode = rs.Fields.Item(nameof(MSS_CONT.U_MSS_CCOD)).Value;
             document.DocCurrency = rs.Fields.Item(nameof(MSS_CONT.U_MSS_MONE)).Value;
-            document.Series = serieDoc;
+            document.Series = Convert.ToInt32(DoQuery(querySeries).Fields.Item(nameof(MSS_CFSE.U_MSS_SEEN)).Value as string);
             document.DocDate = DateTime.Now;
             document.DocDueDate = DateTime.Now;
             document.TaxDate = DateTime.Now;
@@ -308,13 +409,20 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 
             //CAMPOS DE USUARIO
             document.UserFields.Fields.Item(nameof(ODLN.U_MSSL_TOP)).Value = ConstantHelper.DeliveryNoteDefaultInfo.U_MSSL_TOP;
-            document.UserFields.Fields.Item(nameof(ODLN.MSS_SECO)).Value = rs.Fields.Item(nameof(MSS_CONT.Series)).Value;
-            document.UserFields.Fields.Item(nameof(ODLN.MSS_NUCO)).Value = rs.Fields.Item(nameof(MSS_CONT.DocNum)).Value;
+            document.UserFields.Fields.Item(nameof(ODLN.U_MSS_SECT)).Value = rs.Fields.Item(nameof(MSS_CONT.Series)).Value;
+            document.UserFields.Fields.Item(nameof(ODLN.U_MSS_NUCT)).Value = rs.Fields.Item(nameof(MSS_CONT.DocNum)).Value;
 
-            var queryLines = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO_LINES)).Replace(PARAM1, contratoDocEntry.ToString());
+            var queryLines = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO_LINES)).Replace(PARAM1, docEntry.ToString());
             var rsLines = DoQuery(queryLines);
-            for (var i = 1; i <= rsLines.RecordCount; i++)
+
+
+            for (var i = 0; i < registeredDocumentLines; i++)
+                rsLines.MoveNext();
+
+            //for (var i = 1; i <= rsLines.RecordCount; i++)
+            while (!rsLines.BoF)
             {
+
                 //DOCUMENT LINES
                 document.Lines.ItemCode = rsLines.Fields.Item(nameof(MSS_CONT_LINES.U_MSS_AFCO)).Value;
                 document.Lines.Price = 0.00;
@@ -324,14 +432,17 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
                 document.Lines.UserFields.Fields.Item(nameof(DLN1.U_MSSL_CGD)).Value = ConstantHelper.DeliveryNoteDefaultInfo.Lines.U_MSSL_CGD;
                 document.Lines.WTLiable = SAPbobsCOM.BoYesNoEnum.tNO;
                 document.Lines.Add();
-                rs.MoveNext();
+                rsLines.MoveNext();
+                registeredDocumentLines++;
+
+                if (registeredDocumentLines > maxDocumentLines)
+                    CreateDocument(maxDocumentLines);
             }
 
-
-            if (document.Add() == ConstantHelper.DefaulSuccessSAPNumber)
-                return true;
-            return false;
+            if (document.Add() != ConstantHelper.DefaulSuccessSAPNumber)
+                throw new SapException();
         }
+
 
         #endregion
 
@@ -343,8 +454,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
         private const string MENU_IMPRIMIR = "MENU_IMPRIMIR";
         private const string MENU_IMPRIMIR_CAPTION = "Imprimir";
 
-        private const string MENU_CANCELAR = "MENU_CANCELAR";
-        private const string MENU_CANCELAR_CAPTION = "Cancelar";
+        private const string MENU_RECHAZAR = "MENU_RECHAZAR";
+        private const string MENU_RECHAZAR_CAPTION = "Rechazar";
 
         #endregion
     }
