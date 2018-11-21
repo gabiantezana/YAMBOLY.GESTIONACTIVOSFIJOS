@@ -662,55 +662,46 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             }
         }
 
-        private void RegisterItemHistorial(string itemCode, Documents document)
+        private void RegisterItemHistorial(string itemCode, string itemDescription, Documents document)
         {
-
             var queryString = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_MSS_AFHH_UDO_BY_ITEMCODE)).Replace(PARAM1, itemCode);
             var rs = DoQuery(queryString);
             string docEntry = Convert.ToString(rs.Fields.Item(nameof(MSS_AFHH.DocEntry)));
             bool isNewRegister = string.IsNullOrEmpty(docEntry);
 
-            GetCompany().StartTransaction();
-            GeneralService oGeneralService = GetCompany().GetCompanyService().GetGeneralService(nameof(MSS_AFHH));
-            GeneralData oGeneralData = (SAPbobsCOM.GeneralData)oGeneralService.GetDataInterface(GeneralServiceDataInterfaces.gsGeneralData);
+            var generalService = GetCompany().GetCompanyService().GetGeneralService(nameof(MSS_AFHH));
+            var generalData = (GeneralData)generalService.GetDataInterface(GeneralServiceDataInterfaces.gsGeneralData);
 
             if (!isNewRegister)
             {
-                GeneralDataParams headerParams = GetCompany().GetCompanyService().GetGeneralService(nameof(MSS_AFHH)).GetDataInterface(GeneralServiceDataInterfaces.gsGeneralDataParams);
+                var headerParams = (GeneralDataParams)GetCompany().GetCompanyService().GetGeneralService(nameof(MSS_AFHH)).GetDataInterface(GeneralServiceDataInterfaces.gsGeneralDataParams);
                 headerParams.SetProperty(nameof(MSS_AFHH.DocEntry), docEntry);
-                oGeneralData = oGeneralService.GetByParams(headerParams);
+                generalData = generalService.GetByParams(headerParams);
             }
 
-            oGeneralData.SetProperty(nameof(MSS_AFHH.U_MSS_ITCO), itemCode);
-            oGeneralData.SetProperty(nameof(MSS_AFHH.U_MSS_ITDE), itemCode);//TODO:
+            generalData.SetProperty(nameof(MSS_AFHH.U_MSS_ITCO), itemCode);
+            generalData.SetProperty(nameof(MSS_AFHH.U_MSS_ITDE), itemDescription);
 
-            //Setting Data to Child Table Fields
-            GeneralDataCollection oChildren = oGeneralData.Child(nameof(MSS_AFHH_LINES));
-            GeneralData oChild = oChildren.Add();
+            var oChildren = generalData.Child(nameof(MSS_AFHH_LINES));
+            var oChild = oChildren.Add();
             oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_COAL), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
             oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_COCL), GetItemEspecific(nameof(MSS_CONT.U_MSS_CCOD)).Value);
             oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_COCO), GetItemEspecific(nameof(MSS_CONT.DocNum)).Value);
-            //TODO:
-            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_CODI), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
-            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_CODO), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
-            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_DEUB), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
-            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_FECH), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
-            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_NOCL), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
-            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_SECO), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
-            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_SEDO), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
-            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_TIDO), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
-            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_TIUB), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_CODI), document.ShipToCode);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_CODO), document.DocNum);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_DEUB), document.ShipToCode);//Descripción aquí 
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_FECH), DateTime.Today);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_NOCL), document.CardName);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_SECO), GetItemEspecific(nameof(MSS_CONT.Series)).Value);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_SEDO), document.Series);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_TIDO), document.Indicator);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_TIUB), MSS_AFHH_LINES.TIPOUBICACION.CLIENTE.ID);
 
             //Attempt to Add the Record
             if (isNewRegister)
-                oGeneralService.Add(oGeneralData);
+                generalService.Add(generalData);
             else
-                oGeneralService.Update(oGeneralData);
-
-            if (GetCompany().InTransaction)
-            {
-                GetCompany().EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit);
-            }
+                generalService.Update(generalData);
         }
 
         #endregion
