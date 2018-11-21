@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFPE
 {
     [DBStructure]
-    [SAPUDO(Name = "AF- Conf. Permisos",
+    [SAPUDO(Name = "AF- ConfiguracionPermisos",
            HeaderTableType = typeof(MSS_CFPE),
            CanCreateDefaultForm = BoYesNoEnum.tNO,
            CanFind = BoYesNoEnum.tYES,

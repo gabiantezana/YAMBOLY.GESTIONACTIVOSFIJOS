@@ -92,6 +92,7 @@
     <Compile Include="QueryHelper.cs" />
     <Compile Include="SapEntityHelper.cs" />
     <Compile Include="SapEnumHelper.cs" />
+    <Compile Include="SapExtensionHelper.cs" />
     <Compile Include="SapFormHelper.cs" />
     <Compile Include="SapIntefaceHelper.cs" />
     <Compile Include="SapMethodsHelper.cs" />

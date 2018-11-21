@@ -400,7 +400,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
             }
         }
 
-        public static bool AssignFormattedSearchToField(Company oCompany, string queryCategory, string queryName, string formID, string itemID, bool forceRefreshstring, string parentFieldOnChange, bool isChildTable = false)
+        public static bool AssignFormattedSearchToField(Company oCompany, string queryCategory, string queryName, string formID, string itemID, bool forceRefreshstring, string parentFieldOnChange, string matrixId, bool isChildTable = false)
         {
             string columnID = "-1";
             SAPbobsCOM.FormattedSearches oFormattedSearches = null;
@@ -409,7 +409,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
             try
             {
                 oFormattedSearches = (SAPbobsCOM.FormattedSearches)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oFormattedSearches);
-                var exists = oFormattedSearches.GetByKey(GetIDFormattedSearchs(oCompany, formID, isChildTable ? "MATRIX" : itemID, isChildTable ? itemID : "-1"));
+                var exists = oFormattedSearches.GetByKey(GetIDFormattedSearchs(oCompany, formID, isChildTable ? matrixId : itemID, isChildTable ? itemID : "-1"));
 
                 if (exists)
                 {
@@ -427,7 +427,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
                     //if (columnID != "-1") { oFormattedSearches.ColumnID = columnID; }
                     if (isChildTable)
                     {
-                        oFormattedSearches.ItemID = "MATRIX";
+                        oFormattedSearches.ItemID = matrixId;
                         oFormattedSearches.ColumnID = itemID;
                     }
 

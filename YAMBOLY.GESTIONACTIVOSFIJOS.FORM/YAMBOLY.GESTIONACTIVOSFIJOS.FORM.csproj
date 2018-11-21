@@ -79,6 +79,7 @@
     <Compile Include="_MSS_CFPEForm\MSS_CFPEForm.cs" />
     <Compile Include="_MSS_CFSEForm\MSS_CFSEForm.cs" />
     <Compile Include="_MSS_CONTForm\MSS_CONTForm.cs" />
+    <Compile Include="_MSS_CONTForm\_MSS_CONTForm_Modal\MSS_CONTForm_Modal.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\YAMBOLY.GESTIONACTIVOSFIJOS.DATAACCESS\YAMBOLY.GESTIONACTIVOSFIJOS.DATAACCESS.csproj">
@@ -106,6 +107,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="_MSS_CONTForm\MSS_CONTForm.srf" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="_MSS_CONTForm\_MSS_CONTForm_Modal\MSS_CONTForm_Modal.srf" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -258,6 +258,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
                     foreach (var item in list2)
                     {
                         var queryListType = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType).ReflectedType;//Base type to get the parent class of query than contains queryCategory
+                        //var tableType = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.TableName).ReflectedType;//Base type to get the parent class of query than contains queryCategory
+
                         _Schema.FormattedSearchFieldList.Add(new SAPFormattedSearchEntity()
                         {
                             FieldId = item.Name,
@@ -266,6 +268,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
                             QueryName = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.FormattedSearchType).Name,
                             ForceRefreshing = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ForceRefresh),
                             ParentFieldOnChange = item.GetAttributeValue((SAPFieldAttribute attr2) => attr2.ParentFieldOnChange),
+                            MatrixId = item.DeclaringType.GetAttributeValue((SAPTableAttribute att)=> att.MatrixIdInForm),
                             IsChildTable = true,
                         });
                     };

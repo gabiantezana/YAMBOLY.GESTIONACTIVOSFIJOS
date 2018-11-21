@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFSE
 {
     [DBStructure]
-    [SAPUDO(Name = "AF- Conf. Series",
+    [SAPUDO(Name = "AF- ConfiguracionSeries",
            HeaderTableType = typeof(MSS_CFSE),
-           CanCreateDefaultForm = BoYesNoEnum.tNO,
+           CanCreateDefaultForm = BoYesNoEnum.tNO,      
            CanFind = BoYesNoEnum.tYES,
            EnableEnhancedForm = BoYesNoEnum.tYES,
            RebuildEnhancedForm = BoYesNoEnum.tYES,

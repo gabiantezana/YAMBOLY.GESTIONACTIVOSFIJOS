@@ -12,6 +12,7 @@ using SAPADDON.USERMODEL._Menu;
 using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFSE;
 using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CFSEForm;
 using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT;
+using YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm;
 
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 {
@@ -38,8 +39,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             }
             catch (Exception ex)
             {
-                HandleApplicationException(ex);
-                throw;
+                var _ex = HandleApplicationException(ex);
+                throw _ex as Exception;
             }
         }
 
@@ -160,6 +161,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             return new BaseDataAccess().GetQuery(embebbedFileName);
         }
 
+        [Obsolete]
         public static SAPbobsCOM.Recordset DoQuery(EmbebbedFileName embebbedFileName)
         {
             return new BaseDataAccess().DoQuery(embebbedFileName);
@@ -183,6 +185,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             eventFilter = FilterList.Add(SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED);
             eventFilter.AddEx(nameof(MSS_CFSE));
             eventFilter.AddEx(nameof(MSS_CONT));
+            eventFilter.AddEx(nameof(MSS_CONTForm_Modal));
 
             /*
             eventFilter.AddEx(FormID.MSS_VEHI.IdToString());
@@ -235,11 +238,21 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             eventFilter = FilterList.Add(BoEventTypes.et_FORM_DATA_LOAD);
             eventFilter.AddEx(nameof(MSS_CONT));
             eventFilter.AddEx(nameof(MSS_CFSE));
+
+            eventFilter = FilterList.Add(BoEventTypes.et_FORM_LOAD);
+            eventFilter.AddEx(nameof(MSS_CONT));
+
+            eventFilter = FilterList.Add(BoEventTypes.et_MATRIX_LOAD);
+            eventFilter.AddEx(nameof(MSS_CONT));
+
             /*eventFilter.AddEx(FormID.MSS_DESP.IdToString());*/
 
             eventFilter = FilterList.Add(BoEventTypes.et_LOST_FOCUS);
             eventFilter.AddEx(nameof(MSS_CFSE));
             /*eventFilter.AddEx(FormID.MSS_DESP.IdToString());*/
+
+            eventFilter = FilterList.Add(BoEventTypes.et_RIGHT_CLICK);
+            eventFilter.AddEx(nameof(MSS_CONT));
 
             return FilterList;
         }
@@ -267,33 +280,29 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 
         }
 
-
         private void MenuEvent(ref SAPbouiCOM.MenuEvent menuEvent, out bool BubbleEvent)
         {
             BubbleEvent = true;
             try
             {
-                if (!menuEvent.BeforeAction)
+                switch (menuEvent.MenuUID)
                 {
-                    switch (menuEvent.MenuUID)
-                    {
-                        case _Menu.MENU_PRINCIPAL.MENU_CONFIGURACION.MENU_CONFIGURACIONSERIES:
+                    case _Menu.MENU_PRINCIPAL.MENU_CONFIGURACION.MENU_CONFIGURACIONSERIES:
+                        if (!menuEvent.BeforeAction)
                             new _MSS_CFSEForm.MSS_CFSEForm(GetFormOpenList());
-                            break;
-
-                        case _Menu.MENU_PRINCIPAL.MENU_CONFIGURACION.MENU_CONFIGURACIONPERMISOS:
+                        break;
+                    case _Menu.MENU_PRINCIPAL.MENU_CONFIGURACION.MENU_CONFIGURACIONPERMISOS:
+                        if (!menuEvent.BeforeAction)
                             new _MSS_CFPEForm.MSS_CFPEForm(GetFormOpenList());
-                            break;
-
-                        case _Menu.MENU_PRINCIPAL.MENU_CONTRATOCONCESIONACTIVOFIJO:
-                            new _MSS_CONTForm.MSS_CONTForm(GetFormOpenList());
-                            break;
-
-                        default:
-                            if (GetFormOpenList().ContainsKey(GetActiveForm().UniqueID))
-                                GetFormOpenList()[GetActiveForm().UniqueID].HandleMenuDataEvents(menuEvent);
-                            break;
-                    }
+                        break;
+                    case _Menu.MENU_PRINCIPAL.MENU_CONTRATOCONCESIONACTIVOFIJO:
+                        if (!menuEvent.BeforeAction)
+                            new MSS_CONTForm();
+                        break;
+                    default:
+                        if (GetFormOpenList().ContainsKey(GetActiveForm().UniqueID))
+                            GetFormOpenList()[GetActiveForm().UniqueID].HandleMenuDataEvents(menuEvent);
+                        break;
                 }
             }
             catch (Exception ex)
@@ -322,7 +331,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
             }
             finally
             {
-                    GC.Collect();
+                GC.Collect();
                 BubbleEvent = _bubbleEvent;
             }
         }
@@ -399,6 +408,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
                     ShowMessage(MessageType.Error, ex.Message);
                     ExceptionHelper.LogException(ex);
                 }
+                return _ex;
             }
             catch
             {

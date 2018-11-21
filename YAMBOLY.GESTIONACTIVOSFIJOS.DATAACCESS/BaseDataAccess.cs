@@ -100,11 +100,11 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.DATAACCESS
             DBSchema dBSchema = new UserModel().GetDBSchema();
             dBSchema.TableList.ForEach(x => SapMethodsHelper.CreateTable(GetCompany(), x));
             dBSchema.FieldList.ForEach(x => SapMethodsHelper.CreateField(GetCompany(), x));
-            dBSchema.UDOList.ForEach(x => SapMethodsHelper.CreateUDO(GetCompany(), x));
+            dBSchema.UDOList.ForEach(x => SapMethodsHelper.CreateUDO(GetCompany(), x));//TODO:
             dBSchema.FormattedSearchList.ForEach(x => SapMethodsHelper.CreateQuery(GetCompany(), x.QueryName, x.Query, x.QueryCategory));
-            dBSchema.FormattedSearchFieldList.ForEach(x => SapMethodsHelper.AssignFormattedSearchToField(GetCompany(), x.QueryCategory, x.QueryName, x.FormId, x.FieldId, x.ForceRefreshing, x.ParentFieldOnChange, x.IsChildTable));
+            dBSchema.FormattedSearchFieldList.ForEach(x => SapMethodsHelper.AssignFormattedSearchToField(GetCompany(), x.QueryCategory, x.QueryName, x.FormId, x.FieldId, x.ForceRefreshing, x.ParentFieldOnChange, x.MatrixId, x.IsChildTable));
             dBSchema.MenuList.Where(x => x.MenuType == MenuType.MenuPrincipal).ToList().ForEach(x => SapMethodsHelper.CreatePrincipalMenul(GetApplication(), x.MenuUid, x.MenuTitle));
-            dBSchema.MenuList.Where(x => x.MenuType == MenuType.SubMenu && x.SubMenuType == SubMenuType.Folder).OrderByDescending(x=> x.FolderLevel).ToList().ForEach(x => SapMethodsHelper.CreateSubMenu(GetApplication(), x.ParentMenuId, x.MenuUid, x.MenuTitle, (BoMenuType)x.SubMenuType));
+            dBSchema.MenuList.Where(x => x.MenuType == MenuType.SubMenu && x.SubMenuType == SubMenuType.Folder).OrderByDescending(x => x.FolderLevel).ToList().ForEach(x => SapMethodsHelper.CreateSubMenu(GetApplication(), x.ParentMenuId, x.MenuUid, x.MenuTitle, (BoMenuType)x.SubMenuType));
             dBSchema.MenuList.Where(x => x.MenuType == MenuType.SubMenu && x.SubMenuType == SubMenuType.String).ToList().ForEach(x => SapMethodsHelper.CreateSubMenu(GetApplication(), x.ParentMenuId, x.MenuUid, x.MenuTitle, (BoMenuType)x.SubMenuType));
         }
 

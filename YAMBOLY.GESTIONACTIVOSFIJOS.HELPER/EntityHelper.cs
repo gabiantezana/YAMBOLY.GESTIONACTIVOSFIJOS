@@ -28,4 +28,10 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
         public string Motivo { get; set; }
         public string ErrorSAP { get; set; }
     }
+
+    public class FixedAsset
+    {
+        public string ItemCode { get; set; }
+        public string State { get; set; }
+    }
 }

@@ -1,0 +1,1 @@
+﻿SELECT "ItemCode" FROM "OITM" WHERE "InventryNo"= $["@MSS_CONT_ADENDAS".U_MSS_AFCI];

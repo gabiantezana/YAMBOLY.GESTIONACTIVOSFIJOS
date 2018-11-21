@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_AFHI
+namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_AFHH
 {
     /// <summary>
     /// Historial de ubicaciones de activos fijos
     /// </summary>
-    [SAPTable(TableType = SAPbobsCOM.BoUTBTableType.bott_Document)]
-    public class MSS_AFHI
+    [SAPTable(TableType = SAPbobsCOM.BoUTBTableType.bott_Document, TableDescription = "AF- HistorialUbicaciones")]
+    public class MSS_AFHH
     {
         [SAPField(IsSystemField = true)]
         public int DocEntry { get; set; }
@@ -18,9 +18,9 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_AFHI
         public string UserSign { get; set; }
 
         [SAPField(FieldDescription = "Codigo AF")]
-        public string MSS_ITCO { get; set; }
+        public string U_MSS_ITCO { get; set; }
 
         [SAPField(FieldDescription = "Descripcion AF")]
-        public string MSS_ITDE { get; set; }
+        public string U_MSS_ITDE { get; set; }
     }
 }

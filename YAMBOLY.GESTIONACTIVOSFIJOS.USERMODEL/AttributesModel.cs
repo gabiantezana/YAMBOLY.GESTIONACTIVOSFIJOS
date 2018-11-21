@@ -31,6 +31,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
             }
             set { _UserFieldList = value; }
         }
+        public string MatrixIdInForm { get; set; }
     }
 
     internal class SAPFieldAttribute : Attribute

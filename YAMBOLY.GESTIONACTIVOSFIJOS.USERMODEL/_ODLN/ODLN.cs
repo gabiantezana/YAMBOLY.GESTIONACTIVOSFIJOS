@@ -11,12 +11,12 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._ODLN
     /// </summary>
     [SAPTable(IsSystemTable = true)]
     public class ODLN
-    {
-        [SAPField(FieldDescription = "Serie contrato", FieldType = SAPbobsCOM.BoFieldTypes.db_Numeric, FieldSubType = SAPbobsCOM.BoFldSubTypes.st_None, FieldSize = 10)]
-        public static string U_MSS_SECT { get; set; }
+    {   
+        [SAPField(FieldDescription = "Serie contrato")]
+        public static string U_MSS_SERC { get; set; }
 
-        [SAPField(FieldDescription = "Numero contrato", FieldType = SAPbobsCOM.BoFieldTypes.db_Numeric, FieldSubType = SAPbobsCOM.BoFldSubTypes.st_None, FieldSize = 10)]
-        public static string U_MSS_NUCT { get; set; }
+        [SAPField(FieldDescription = "Numero contrato")]
+        public static string U_MSS_NUMC { get; set; }
 
         [SAPField(IsSystemField = true)]
         public static string U_MSSL_TOP { get; set; }

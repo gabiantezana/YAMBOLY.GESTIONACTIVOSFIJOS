@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT;
 using System;
 using static YAMBOLY.GESTIONACTIVOSFIJOS.HELPER.ConstantHelper;
-using System.Reflection;
 using SAPADDON.USERMODEL.Helper;
 using SAPADDON.USERMODEL._FormattedSearches;
 using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFPE;
@@ -13,6 +12,10 @@ using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._ODLN;
 using SAPADDON.USERMODEL._DLN1;
 using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFSE;
 using YAMBOLY.GESTIONACTIVOSFIJOS.EXCEPTION;
+using SAPbobsCOM;
+using System.Linq;
+using SAPADDON.HELPER;
+using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_AFHH;
 
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 {
@@ -21,22 +24,20 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
         public const string FormType = nameof(MSS_CONT);
         private Form _Form { get; set; }
 
-        public MSS_CONTForm(Dictionary<string, ISAPForm> dictionary)
+        public MSS_CONTForm()
         {
             _Form = SapFormHelper.CreateForm(GetApplication(), XMLHelper.GetResourceString(System.Reflection.Assembly.GetExecutingAssembly(), this.GetType().Name), FormType);
-            dictionary.Add(_Form.UniqueID, this);
+            GetFormOpenList().Add(_Form.UniqueID, this);
+            CreateMenuAndButtons();
+
             LoadSeries();
+            EnableMenuItems();
             SetEstadoAsPendiente();
-            GetMatrix().AddRow();
             _Form.EnableFormatSearch();
 
-            _Form.EnableMenu(MenuUID.AddLine, true);
-            _Form.EnableMenu(MenuUID.RemoveLine, true);
-            CreateRightClickMenu();
         }
 
-
-        private void CreateRightClickMenu()
+        private void CreateMenuAndButtons()
         {
             MenuCreationParams oCreationPackage = GetApplication().CreateObject(SAPbouiCOM.BoCreatableObjectType.cot_MenuCreationParams);
             oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING;
@@ -44,18 +45,43 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             oCreationPackage.UniqueID = MENU_IMPRIMIR;
             oCreationPackage.String = MENU_IMPRIMIR_CAPTION;
             _Form.Menu.AddEx(oCreationPackage);
+            _Form.EnableMenu(oCreationPackage.UniqueID, false);
 
             oCreationPackage.UniqueID = MENU_LEGALIZAR;
             oCreationPackage.String = MENU_LEGALIZAR_CAPTION;
             _Form.Menu.AddEx(oCreationPackage);
+            _Form.EnableMenu(oCreationPackage.UniqueID, false);
 
             oCreationPackage.UniqueID = MENU_RECHAZAR;
             oCreationPackage.String = MENU_RECHAZAR_CAPTION;
             _Form.Menu.AddEx(oCreationPackage);
+            _Form.EnableMenu(oCreationPackage.UniqueID, false);
 
-            _Form.EnableMenu(MENU_IMPRIMIR, false);
-            _Form.EnableMenu(MENU_LEGALIZAR, false);
-            _Form.EnableMenu(MENU_RECHAZAR, false);
+            oCreationPackage.UniqueID = MENU_ADDLINE_MATRIX1;
+            oCreationPackage.String = MENU_ADDLINE_MATRIX1_CAPTION;
+            _Form.Menu.AddEx(oCreationPackage);
+            _Form.EnableMenu(oCreationPackage.UniqueID, false);
+
+            oCreationPackage.UniqueID = MENU_ADDLINE_MATRIX2;
+            oCreationPackage.String = MENU_ADDLINE_MATRIX2_CAPTION;
+            _Form.Menu.AddEx(oCreationPackage);
+            _Form.EnableMenu(oCreationPackage.UniqueID, false);
+
+            oCreationPackage.UniqueID = MENU_REMOVELINE_MATRIX1;
+            oCreationPackage.String = MENU_REMOVELINE_MATRIX1_CAPTION;
+            _Form.Menu.AddEx(oCreationPackage);
+            _Form.EnableMenu(oCreationPackage.UniqueID, false);
+
+            oCreationPackage.UniqueID = MENU_REMOVELINE_MATRIX2;
+            oCreationPackage.String = MENU_REMOVELINE_MATRIX2_CAPTION;
+            _Form.Menu.AddEx(oCreationPackage);
+            _Form.EnableMenu(oCreationPackage.UniqueID, false);
+
+
+            #region Matrix options 
+
+
+            #endregion
         }
 
         private void EnableMenuItems()
@@ -88,15 +114,12 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
                                 .Replace(PARAM2, docNum);
 
                     if (DoQuery(query).RecordCount > 0)//Tiene una o más entregas asociadas
-                    {
-                        (_Form.Items.Item("3").Specific as Button).Caption = "Retorno";
-                        _Form.Items.Item("3").Visible = true;
-                    }
+                        (_Form.Items.Item("3").Specific as Button).Caption = BUTTON_RETORNAR_CAPTION;
+
                     else//No tiene ninguna entrega asociada
-                    {
-                        (_Form.Items.Item("3").Specific as Button).Caption = "Concesión";
-                        _Form.Items.Item("3").Visible = true;
-                    }
+                        (_Form.Items.Item("3").Specific as Button).Caption = BUTTON_CONCESION_CAPTION;
+
+                    _Form.Items.Item("3").Visible = true;
                     break;
                 //------------------------------------------------------------------------------------------- 
                 default:
@@ -131,51 +154,22 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 
         private Matrix GetMatrix()
         {
-            return _Form.Items.Item("MATRIX").Specific as Matrix;
+            return _Form.Items.Item("MATRIX1").Specific as Matrix;
         }
 
-        private DBDataSource GetDataSource()
+        private Matrix GetMatrix2()
         {
-            return _Form.DataSources.DBDataSources.Item(0);
+            return _Form.Items.Item("MATRIX2").Specific as Matrix;
         }
 
-        private dynamic GetItemEspecific(string itemName)
+        private DBDataSource GetDataSource(int index = 0)
+        {
+            return _Form.DataSources.DBDataSources.Item(index);
+        }
+
+        public dynamic GetItemEspecific(string itemName)
         {
             return _Form.Items.Item(itemName).Specific;
-        }
-
-        private bool BeforeSave()
-        {
-            //-------------------------------------------Valida que el documento se pueda modificar--------------------------------------------
-            string currentState = (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Value.Trim();
-            switch (currentState)
-            {
-                case MSS_CONT.ESTADO.PENDIENTE.KEY:
-                case null:
-                case "":
-                    break;
-                case MSS_CONT.ESTADO.IMPRESO.KEY:
-                case MSS_CONT.ESTADO.RECHAZADO.KEY:
-                case MSS_CONT.ESTADO.LEGALIZADO.KEY:
-                default:
-                    throw new Exception("El documento no puede ser modificado con el estado actual.");
-            }
-
-
-            var almacen = (GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)) as EditText).Value;
-            if (string.IsNullOrEmpty(almacen))
-                throw new Exception("Seleccione el almacén");
-
-            //-------------------------Valida que el usuariotenga permiso para crear estado pendiente-------------------------------------
-            var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_PERMISO_ALMACEN_ESTADO));
-            query = query.Replace(PARAM1, GetCompany().UserName).Replace(PARAM2, almacen);
-            query = query.Replace(PARAM3, nameof(MSS_CFPE.U_MSS_PEPE));
-            if (DoQuery(query).RecordCount == 0)
-                throw new Exception("El usuario no tiene permiso");
-
-            //----------------------------------------------------Actualiza campos---------------------------------------------------------
-            ResetItemsState();
-            return true;
         }
 
         private void ChangeStateItemsOfGrid()
@@ -206,7 +200,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
                 var rs = DoQuery(query);
                 for (var i = 1; i <= rs.RecordCount; i++)
                 {
-                    itemCode = rs.Fields.Item(nameof(MSS_CONT_LINES.U_MSS_AFCI)).Value;
+                    itemCode = rs.Fields.Item(nameof(MSS_CONT_LINES.U_MSS_AFCO)).Value;
                     UpdateItem(itemCode, OITM.ValidValues.MSS_EAAF.Disponible.ID);
                     rs.MoveNext();
                 }
@@ -215,9 +209,33 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             //-------------------------------Marca como reservado solo los que están en la matriz----------------------------------------
             for (var i = 1; i <= GetMatrix().VisualRowCount; i++)
             {
-                itemCode = GetMatrix().Columns.Item(nameof(MSS_CONT_LINES.U_MSS_AFCI)).Cells.Item(i).Specific.Value;
+                itemCode = GetMatrix().Columns.Item(nameof(MSS_CONT_LINES.U_MSS_AFCO)).Cells.Item(i).Specific.Value;
                 UpdateItem(itemCode, OITM.ValidValues.MSS_EAAF.Reservado.ID);
             }
+        }
+
+        private void ShowModal()
+        {
+            new MSS_CONTForm_Modal(GetFormOpenList(), this);
+        }
+
+        private void RemoveLine()
+        {
+
+        }
+
+        private List<FixedAsset> GetItemsFromContrato(string docEntry)
+        {
+            var queryLines = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO_LINES)).Replace(PARAM1, docEntry);
+            var rsLines = DoQuery(queryLines);
+
+            var list = new List<FixedAsset>();
+            while (!rsLines.EoF)
+            {
+                list.Add(new FixedAsset() { ItemCode = rsLines.Fields.Item(nameof(MSS_CONT_LINES.U_MSS_AFCO)).Value, State = OITM.ValidValues.MSS_EAAF.Asignado.ID });
+                rsLines.MoveNext();
+            }
+            return list;
         }
 
         #region Queries
@@ -282,7 +300,6 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             DoQuery(query);
         }
 
-
         #endregion
 
         #region Events
@@ -293,14 +310,22 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
                 LoadNumeration();
 
             else if (itemEvent.ItemUID == "1" && itemEvent.BeforeAction)
-                return BeforeSave();
+                return Crear();
 
             else if (itemEvent.ItemUID == "3" && itemEvent.ActionSuccess)
             {
-                if (GetApplication().MessageBox("Se procederá a realizar la concesión temporal del activo fijo. Desea continuar?", 1, "Sí", "No") == 1)
-                    CreateDocument(2);
+                switch (GetItemEspecific("3").Caption)
+                {
+                    case BUTTON_CONCESION_CAPTION:
+                        CrearConcesion();
+                        break;
+                    case BUTTON_RETORNAR_CAPTION:
+                        ShowModal();
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
             }
-
             return true;
         }
         public bool HandleItemPressed(ItemEvent oEvent) { return true; }
@@ -313,7 +338,10 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 
                     break;
 
+                case BoEventTypes.et_FORM_LOAD://TODO:
                 case BoEventTypes.et_FORM_DATA_LOAD:
+                case BoEventTypes.et_DATASOURCE_LOAD:
+                case BoEventTypes.et_MATRIX_LOAD:
                     if (oBusinessObjectInfo.ActionSuccess)
                         EnableMenuItems();
                     break;
@@ -322,38 +350,68 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
         }
         public bool HandleMenuDataEvents(MenuEvent menuEvent)
         {
+            string itemUID = _Form.GetCurrentItemUID();
+            int rowCount = 0;
             switch (menuEvent.MenuUID)
             {
-                case MenuUID.AddLine:
-                    if (!menuEvent.BeforeAction)
-                    {
-                        // clean the DBDataSources associated to the matrix
-                        _Form.DataSources.DBDataSources.Item(1).Clear();
-
-                        // add the line to the matrix
-                        int rowCount = GetMatrix().RowCount;
-                        GetMatrix().AddRow(1, rowCount);
-                        GetMatrix().SelectRow(1 + rowCount, true, false);
-
-                        //And to delete a line:
-                        /*  nq33
-                        int selRow = GetMatrix().GetNextSelectedRow(0, BoOrderType.ot_SelectionOrder);
-                        if (selRow == -1)
-                            return false;
-                        GetMatrix().DeleteRow(selRow);*/
-                    }
-                    break;
                 case MenuUID.MenuCrear:
                     SetEstadoAsPendiente();
                     break;
                 case MENU_IMPRIMIR:
-                    UpdateContState(GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value, MSS_CONT.ESTADO.IMPRESO.KEY);
+                    Imprimir();
                     break;
                 case MENU_RECHAZAR:
-                    UpdateContState(GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value, MSS_CONT.ESTADO.RECHAZADO.KEY);
+                    Rechazar();
                     break;
                 case MENU_LEGALIZAR:
-                    UpdateContState(GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value, MSS_CONT.ESTADO.LEGALIZADO.KEY);
+                    Legalizar();
+                    break;
+                case MENU_ADDLINE_MATRIX1:
+                    if (!menuEvent.BeforeAction)
+                    {
+                        _Form.DataSources.DBDataSources.Item(1).Clear();
+                        rowCount = GetMatrix().RowCount;
+                        GetMatrix().AddRow(1, rowCount);
+                        GetMatrix().SelectRow(1 + rowCount, true, false);
+                    }
+                    break;
+                case MENU_ADDLINE_MATRIX2:
+                    if (!menuEvent.BeforeAction)
+                    {
+                        _Form.DataSources.DBDataSources.Item(2).Clear();
+                        rowCount = GetMatrix2().RowCount;
+                        GetMatrix2().AddRow(1, rowCount);
+                        GetMatrix2().SelectRow(1 + rowCount, true, false);
+                    }
+                    break;
+                case MENU_REMOVELINE_MATRIX1:
+                    if (menuEvent.BeforeAction)
+                    {
+                        int? currentRowNumber;
+                        currentRowNumber = GetMatrix().GetRowNumberFocus();
+                        if (currentRowNumber != null)
+                        {
+                            GetMatrix().FlushToDataSource();
+                            GetDataSource(1).RemoveRecord(currentRowNumber.Value - 1);
+                        }
+
+                    }
+                    else
+                        GetMatrix().LoadFromDataSource();
+                    break;
+                case MENU_REMOVELINE_MATRIX2:
+                    if (menuEvent.BeforeAction)
+                    {
+                        int? currentRowNumber;
+                        currentRowNumber = GetMatrix2().GetRowNumberFocus();
+                        if (currentRowNumber != null)
+                        {
+                            GetMatrix2().FlushToDataSource();
+                            GetDataSource(2).RemoveRecord(currentRowNumber.Value - 1);
+                        }
+                    }
+                    else
+                        GetMatrix2().LoadFromDataSource();
                     break;
                 default:
                     break;
@@ -361,88 +419,299 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 
             return true;
         }
-        public bool HandleRightClickEvent(ContextMenuInfo menuInfo) { return true; }
+        public bool HandleRightClickEvent(ContextMenuInfo menuInfo)
+        {
+            _Form.EnableMenu(MENU_ADDLINE_MATRIX1, false);
+            _Form.EnableMenu(MENU_ADDLINE_MATRIX2, false);
+            _Form.EnableMenu(MENU_REMOVELINE_MATRIX1, false);
+            _Form.EnableMenu(MENU_REMOVELINE_MATRIX2, false);
+
+            if (menuInfo.BeforeAction && (menuInfo.ItemUID == "MATRIX1" || menuInfo.ItemUID == "MATRIX2"))//&& menuInfo.Row != 0)
+            {
+                switch (menuInfo.ItemUID)
+                {
+                    case "MATRIX1":
+                        _Form.EnableMenu(MENU_ADDLINE_MATRIX1, true);
+                        if (GetMatrix().GetRowNumberFocus().HasValue)
+                            _Form.EnableMenu(MENU_REMOVELINE_MATRIX1, true);
+                        break;
+                    case "MATRIX2":
+                        _Form.EnableMenu(MENU_ADDLINE_MATRIX2, true);
+                        if (GetMatrix2().GetRowNumberFocus().HasValue)
+                            _Form.EnableMenu(MENU_REMOVELINE_MATRIX2, true);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            return true;
+        }
 
         #endregion
 
         #region CreateDocuments
-        private void CreateDocuments()
+
+        private bool Crear()
         {
-            var codigoAlmacen = (GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)) as EditText).Value;
-            var docEntry = (GetItemEspecific(nameof(MSS_CONT.DocEntry)) as EditText).Value;
-            var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_MSS_CFSE)).Replace(ConstantHelper.PARAM1, codigoAlmacen);
+            //-------------------------------------------Valida que el documento se pueda modificar--------------------------------------------
+            string currentState = (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Value.Trim();
+            switch (currentState)
+            {
+                case MSS_CONT.ESTADO.PENDIENTE.KEY:
+                case null:
+                case "":
+                    break;
+                case MSS_CONT.ESTADO.IMPRESO.KEY:
+                case MSS_CONT.ESTADO.RECHAZADO.KEY:
+                case MSS_CONT.ESTADO.LEGALIZADO.KEY:
+                default:
+                    throw new Exception("El documento no puede ser modificado con el estado actual.");
+            }
 
-            var maxDocumentLines = Convert.ToInt32(DoQuery(query).Fields.Item(nameof(MSS_CFSE.U_MSS_NULI))?.Value ?? 0);
-            if (maxDocumentLines < 1)
-                throw new CustomException("No se ha definido el número máximo de líneas para este almacén en la configuración de series por almacén.");
 
+            var almacen = (GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)) as EditText).Value;
+            if (string.IsNullOrEmpty(almacen))
+                throw new Exception("Seleccione el almacén");
 
+            //-------------------------Valida que el usuariotenga permiso para crear estado pendiente-------------------------------------
+            var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_PERMISO_ALMACEN_ESTADO));
+            query = query.Replace(PARAM1, GetCompany().UserName).Replace(PARAM2, almacen);
+            query = query.Replace(PARAM3, nameof(MSS_CFPE.U_MSS_PEPE));
+            if (DoQuery(query).RecordCount == 0)
+                throw new Exception("El usuario no tiene permiso");
+
+            //----------------------------------------------------Actualiza campos---------------------------------------------------------
+            ResetItemsState();
+            return true;
         }
 
+        private void Imprimir()
+        {
+            UpdateContState(GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value, MSS_CONT.ESTADO.IMPRESO.KEY);
+            ShowMessage(MessageType.Success, "El documento se imprimió correctamente.");
+        }
 
-        int registeredDocumentLines = 0;
-        private void CreateDocument(int maxDocumentLines)
+        private void Rechazar()
+        {
+            string docEntry = GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value;
+
+            GetItemsFromContrato(docEntry).ForEach(x => UpdateItem(x.ItemCode, OITM.ValidValues.MSS_EAAF.Disponible.ID));
+            UpdateContState(GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value, MSS_CONT.ESTADO.RECHAZADO.KEY);
+            ShowMessage(MessageType.Success, "El documento se rechazó correctamente.");
+        }
+
+        private void Legalizar()
+        {
+            UpdateContState(GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value, MSS_CONT.ESTADO.LEGALIZADO.KEY);
+            ShowMessage(MessageType.Success, "El documento se legalizó correctamente.");
+        }
+
+        private void CrearConcesion()
+        {
+            string docEntry = GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value;
+            string message = "Se procederá a realizar la concesión temporal de los activos fijos. Esta acción no se puede revertir. Desea continuar?";
+
+            CrearDocumentos(message, BoObjectTypes.oDeliveryNotes, GetItemsFromContrato(docEntry));
+            ShowMessage(MessageType.Success, "Se realizó correctamente la concesión de activos fijos.");
+        }
+
+        public void CrearRetorno(List<FixedAsset> SelectedItems)
+        {
+            string message = "Se procederá a realizar el retorno de los activos fijos. Esta acción no se puede revertir. Desea continuar?";
+
+            CrearDocumentos(message, BoObjectTypes.oReturns, SelectedItems);
+            ShowMessage(MessageType.Success, "Se realizó correctamente el retorno de activos fijos.");
+        }
+
+        private void CrearDocumentos(string message, BoObjectTypes boObjectType, List<FixedAsset> itemCodes)
+        {
+            if (GetApplication().MessageBox(message, 1, "Sí", "No") == 1)
+            {
+                try
+                {
+                    //------------------------------------Obtiene cantidad de líneas máximas por documento------------------------------------------
+                    string almacen = GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value as string;
+                    if (string.IsNullOrEmpty(almacen))
+                        throw new Exception("Error al obtener el almacén");
+
+                    var queryString = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_MSS_CFSE)).Replace(PARAM1, almacen);
+                    int? maxLines = DoQuery(queryString).Fields.Item(nameof(MSS_CFSE.U_MSS_NULI)).Value as int?;
+
+                    var docEntry = GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value;
+                    string queryLines = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO_LINES)).Replace(PARAM1, docEntry.ToString());
+                    var rsLines = DoQuery(queryLines);
+                    //------------------------------------------------------------------------------------------------------------------------------
+
+                    //Inicia transacción
+                    GetCompany().StartTransaction();
+                    //Crea documento(s) en SAP
+                    CreateDocument(boObjectType, itemCodes.Select(x => x.ItemCode).ToList(), maxLines);
+
+                    //Actualiza estado de activos fijos
+                    itemCodes.ForEach(x => UpdateItem(x.ItemCode, x.State));
+
+                    //Finaliza transacción
+                    GetCompany().EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit);
+                }
+                catch (Exception)
+                {
+                    if (GetCompany().InTransaction)
+                        GetCompany().EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
+                    throw;
+                }
+            }
+        }
+
+        private void CreateDocument(BoObjectTypes boObjectType, List<string> itemCodeList, int? maxLinesPerDocument, int lineaAEmpezar = 1)
         {
             var query_ = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_RELATED_DELIVERY)).Replace(PARAM1, (GetItemEspecific(nameof(MSS_CONT.Series)) as ComboBox).Value).Replace(PARAM2, (GetItemEspecific(nameof(MSS_CONT.DocNum)) as EditText).Value);
             if (DoQuery(query_).RecordCount > 0)
                 throw new Exception("Ya se generó una cesión temporal para este documento.");
 
             var docEntry = (GetItemEspecific(nameof(MSS_CONT.DocEntry)) as EditText).Value;
+            var queryContrato = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO)).Replace(PARAM1, docEntry.ToString());
+            var rsQueryContrato = DoQuery(queryContrato);
 
-            SAPbobsCOM.Documents document = GetCompany().GetBusinessObject(SAPbobsCOM.BoObjectTypes.oDeliveryNotes);
+            var querySeries = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_MSS_CFSE)).Replace(PARAM1, rsQueryContrato.Fields.Item(nameof(MSS_CONT.U_MSS_ADES)).Value);
+            string series;
+
+            switch (boObjectType)
+            {
+                case BoObjectTypes.oDeliveryNotes:
+                    series = DoQuery(querySeries).Fields.Item(nameof(MSS_CFSE.U_MSS_SEEN)).Value as string;
+                    break;
+                case BoObjectTypes.oReturns:
+                    series = DoQuery(querySeries).Fields.Item(nameof(MSS_CFSE.U_MSS_SEDE)).Value as string;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            if (string.IsNullOrEmpty(series))
+                throw new Exception("No se ha definido una serie para este almacén");
+
+            SAPbobsCOM.Documents document = GetCompany().GetBusinessObject(boObjectType);
+
             document.DocType = SAPbobsCOM.BoDocumentTypes.dDocument_Items;
-
-            var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO)).Replace(PARAM1, docEntry.ToString());
-            var rs = DoQuery(query);
-
-            var querySeries = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_MSS_CFSE)).Replace(PARAM1, rs.Fields.Item(nameof(MSS_CONT.U_MSS_ADES)).Value);
-
-            document.CardCode = rs.Fields.Item(nameof(MSS_CONT.U_MSS_CCOD)).Value;
-            document.DocCurrency = rs.Fields.Item(nameof(MSS_CONT.U_MSS_MONE)).Value;
-            document.Series = Convert.ToInt32(DoQuery(querySeries).Fields.Item(nameof(MSS_CFSE.U_MSS_SEEN)).Value as string);
+            document.CardCode = rsQueryContrato.Fields.Item(nameof(MSS_CONT.U_MSS_CCOD)).Value;
+            document.DocCurrency = rsQueryContrato.Fields.Item(nameof(MSS_CONT.U_MSS_MONE)).Value;
+            document.Series = Convert.ToInt32(series);
             document.DocDate = DateTime.Now;
             document.DocDueDate = DateTime.Now;
             document.TaxDate = DateTime.Now;
             document.Indicator = ConstantHelper.DeliveryNoteDefaultInfo.Indicator;
-            document.PayToCode = rs.Fields.Item(nameof(MSS_CONT.U_MSS_CDEN)).Value;
+            document.PayToCode = rsQueryContrato.Fields.Item(nameof(MSS_CONT.U_MSS_CDEN)).Value;
             //TODO: ? CONDICIÓN DE PAGO
-
-            //CAMPOS DE USUARIO
             document.UserFields.Fields.Item(nameof(ODLN.U_MSSL_TOP)).Value = ConstantHelper.DeliveryNoteDefaultInfo.U_MSSL_TOP;
-            document.UserFields.Fields.Item(nameof(ODLN.U_MSS_SECT)).Value = rs.Fields.Item(nameof(MSS_CONT.Series)).Value;
-            document.UserFields.Fields.Item(nameof(ODLN.U_MSS_NUCT)).Value = rs.Fields.Item(nameof(MSS_CONT.DocNum)).Value;
+            document.UserFields.Fields.Item(nameof(ODLN.U_MSS_SERC)).Value = Convert.ToString(rsQueryContrato.Fields.Item(nameof(MSS_CONT.Series)).Value);
+            document.UserFields.Fields.Item(nameof(ODLN.U_MSS_NUMC)).Value = Convert.ToString(rsQueryContrato.Fields.Item(nameof(MSS_CONT.DocNum)).Value);
 
+            /*
             var queryLines = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO_LINES)).Replace(PARAM1, docEntry.ToString());
             var rsLines = DoQuery(queryLines);
 
-
-            for (var i = 0; i < registeredDocumentLines; i++)
+            for (var i = 1; i < lineNumber; i++)
                 rsLines.MoveNext();
 
-            //for (var i = 1; i <= rsLines.RecordCount; i++)
-            while (!rsLines.BoF)
+            var documentLine = 0;
+            while (!rsLines.EoF)
             {
-
-                //DOCUMENT LINES
                 document.Lines.ItemCode = rsLines.Fields.Item(nameof(MSS_CONT_LINES.U_MSS_AFCO)).Value;
                 document.Lines.Price = 0.00;
                 document.Lines.TaxCode = ConstantHelper.DeliveryNoteDefaultInfo.TaxCode;
-                document.Lines.WarehouseCode = rs.Fields.Item(nameof(MSS_CONT.U_MSS_ADES)).Value;
+                document.Lines.WarehouseCode = rsQueryContrato.Fields.Item(nameof(MSS_CONT.U_MSS_ADES)).Value;
                 document.Lines.UserFields.Fields.Item(nameof(DLN1.U_MSSL_CGP)).Value = ConstantHelper.DeliveryNoteDefaultInfo.Lines.U_MSSL_CGP;
                 document.Lines.UserFields.Fields.Item(nameof(DLN1.U_MSSL_CGD)).Value = ConstantHelper.DeliveryNoteDefaultInfo.Lines.U_MSSL_CGD;
                 document.Lines.WTLiable = SAPbobsCOM.BoYesNoEnum.tNO;
                 document.Lines.Add();
                 rsLines.MoveNext();
-                registeredDocumentLines++;
 
-                if (registeredDocumentLines > maxDocumentLines)
-                    CreateDocument(maxDocumentLines);
+                documentLine++;
+                if (documentLine == maxLinesPerDocument)
+                    break;
+            }*/
+
+            for (int i = 0; i < itemCodeList.Count; i++)
+            {
+                document.Lines.ItemCode = itemCodeList[(i + lineaAEmpezar) - 1];
+                document.Lines.Price = 0.00;
+                document.Lines.TaxCode = ConstantHelper.DeliveryNoteDefaultInfo.TaxCode;
+                document.Lines.WarehouseCode = rsQueryContrato.Fields.Item(nameof(MSS_CONT.U_MSS_ADES)).Value;
+                document.Lines.UserFields.Fields.Item(nameof(DLN1.U_MSSL_CGP)).Value = ConstantHelper.DeliveryNoteDefaultInfo.Lines.U_MSSL_CGP;
+                document.Lines.UserFields.Fields.Item(nameof(DLN1.U_MSSL_CGD)).Value = ConstantHelper.DeliveryNoteDefaultInfo.Lines.U_MSSL_CGD;
+                document.Lines.WTLiable = SAPbobsCOM.BoYesNoEnum.tNO;
+
+                if (i < maxLinesPerDocument)
+                {
+                    document.Lines.Add();
+                    RegisterItemHistorial(itemCodeList[(i + lineaAEmpezar) - 1], document);
+                }
+                else
+                {
+                    CreateDocument(boObjectType, itemCodeList, maxLinesPerDocument, i + lineaAEmpezar + 1);
+                    break;
+                }
             }
 
             if (document.Add() != ConstantHelper.DefaulSuccessSAPNumber)
                 throw new SapException();
+            else
+            {
+                //Registra historial de cada item agregado
+                itemCodeList.ForEach(x => RegisterItemHistorial(x, document));
+            }
         }
 
+        private void RegisterItemHistorial(string itemCode, Documents document)
+        {
+
+            var queryString = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_MSS_AFHH_UDO_BY_ITEMCODE)).Replace(PARAM1, itemCode);
+            var rs = DoQuery(queryString);
+            string docEntry = Convert.ToString(rs.Fields.Item(nameof(MSS_AFHH.DocEntry)));
+            bool isNewRegister = string.IsNullOrEmpty(docEntry);
+
+            GetCompany().StartTransaction();
+            GeneralService oGeneralService = GetCompany().GetCompanyService().GetGeneralService(nameof(MSS_AFHH));
+            GeneralData oGeneralData = (SAPbobsCOM.GeneralData)oGeneralService.GetDataInterface(GeneralServiceDataInterfaces.gsGeneralData);
+
+            if (!isNewRegister)
+            {
+                GeneralDataParams headerParams = GetCompany().GetCompanyService().GetGeneralService(nameof(MSS_AFHH)).GetDataInterface(GeneralServiceDataInterfaces.gsGeneralDataParams);
+                headerParams.SetProperty(nameof(MSS_AFHH.DocEntry), docEntry);
+                oGeneralData = oGeneralService.GetByParams(headerParams);
+            }
+
+            oGeneralData.SetProperty(nameof(MSS_AFHH.U_MSS_ITCO), itemCode);
+            oGeneralData.SetProperty(nameof(MSS_AFHH.U_MSS_ITDE), itemCode);//TODO:
+
+            //Setting Data to Child Table Fields
+            GeneralDataCollection oChildren = oGeneralData.Child(nameof(MSS_AFHH_LINES));
+            GeneralData oChild = oChildren.Add();
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_COAL), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_COCL), GetItemEspecific(nameof(MSS_CONT.U_MSS_CCOD)).Value);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_COCO), GetItemEspecific(nameof(MSS_CONT.DocNum)).Value);
+            //TODO:
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_CODI), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_CODO), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_DEUB), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_FECH), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_NOCL), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_SECO), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_SEDO), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_TIDO), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
+            oChild.SetProperty(nameof(MSS_AFHH_LINES.U_MSS_TIUB), GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value);
+
+            //Attempt to Add the Record
+            if (isNewRegister)
+                oGeneralService.Add(oGeneralData);
+            else
+                oGeneralService.Update(oGeneralData);
+
+            if (GetCompany().InTransaction)
+            {
+                GetCompany().EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit);
+            }
+        }
 
         #endregion
 
@@ -456,6 +725,22 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 
         private const string MENU_RECHAZAR = "MENU_RECHAZAR";
         private const string MENU_RECHAZAR_CAPTION = "Rechazar";
+
+        private const string BUTTON_CONCESION_CAPTION = "Concesión";
+        private const string BUTTON_RETORNAR_CAPTION = "Retorno";
+
+        private const string MENU_ADDLINE_MATRIX1 = "MENU_ADDLINE_MATRIX1";
+        private const string MENU_ADDLINE_MATRIX1_CAPTION = "Agregar línea";
+
+        private const string MENU_ADDLINE_MATRIX2 = "MENU_ADDLINE_MATRIX2";
+        private const string MENU_ADDLINE_MATRIX2_CAPTION = "Agregar línea";
+
+
+        private const string MENU_REMOVELINE_MATRIX1 = "MENU_REMOVELINE_MATRIX1";
+        private const string MENU_REMOVELINE_MATRIX1_CAPTION = "Eliminar línea";
+
+        private const string MENU_REMOVELINE_MATRIX2 = "MENU_REMOVELINE_MATRIX2";
+        private const string MENU_REMOVELINE_MATRIX2_CAPTION = "Eliminar línea";
 
         #endregion
     }

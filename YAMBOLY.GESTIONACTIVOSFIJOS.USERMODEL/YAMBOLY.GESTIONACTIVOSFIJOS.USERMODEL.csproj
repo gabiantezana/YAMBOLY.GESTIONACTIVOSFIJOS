@@ -88,14 +88,15 @@
   <ItemGroup>
     <Compile Include="Helper\FileHelper.cs" />
     <Compile Include="_DLN1\DLN1.cs" />
+    <Compile Include="_MSS_CONT\MSS_CONT_ADENDAS.cs" />
     <Compile Include="_Queries\Queries.cs" />
     <Compile Include="_Menu\_Menu.cs" />
     <Compile Include="_MSS_CONT\MSS_CONT.cs" />
     <Compile Include="_MSS_CONT\MSS_CONT_LINES.cs" />
     <Compile Include="_MSS_CONT\MSS_CONT_UDO.cs" />
-    <Compile Include="_MSS_AFHI\MSS_AFHI.cs" />
-    <Compile Include="_MSS_AFHI\MSS_AFHI_LINES.cs" />
-    <Compile Include="_MSS_AFHI\MSS_AFHI_UDO.cs" />
+    <Compile Include="_MSS_AFHH\MSS_AFHH.cs" />
+    <Compile Include="_MSS_AFHH\MSS_AFHH_LINES.cs" />
+    <Compile Include="_MSS_AFHH\MSS_AFHH_UDO.cs" />
     <Compile Include="AttributesModel.cs" />
     <Compile Include="EntityModel.cs" />
     <Compile Include="_MSS_CFPE\MSS_CFPE.cs" />
@@ -155,16 +156,16 @@
     <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_CONTACTPERSON_NAME_U_MSS_DNOM.sql" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_OITM_LIST.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_MATRIX1_OITM_LIST.sql" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_OITM_ITEMCODE.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_MATRIX1_ITEMCODE.sql" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_OITM_ITEMNAME.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_MATRIX1_ITEMNAME.sql" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_OITM_VALORADQUISICION.sql" />
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_MATRIX1_VALORADQUISICION.sql" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="_Queries\QueryString\MSS_QS_GET_CONTRATO.sql" />
@@ -186,6 +187,24 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="_Queries\QueryString\MSS_QS_UPDATE_CONT_STATE.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_GET_LISTARETORNO.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_MATRIX2_ITEMCODE.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_MATRIX2_ITEMNAME.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_MATRIX2_OITM_LIST.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_MATRIX2_VALORADQUISICION.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_GET_MSS_AFHH_UDO_BY_ITEMCODE.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

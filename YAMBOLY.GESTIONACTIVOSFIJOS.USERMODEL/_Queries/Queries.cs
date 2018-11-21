@@ -11,7 +11,7 @@ namespace SAPADDON.USERMODEL._FormattedSearches
     public class Queries
     {
         [QueryCategory]
-        public class ACCTIVOSFIJOS3//todo: cambiar el nombre
+        public class ACCTIVOSFIJOS4//todo: cambiar el nombre
         {
             [Query]
             public static class MSS_FS_LIST_SERIES_ENTREGA { }
@@ -86,16 +86,32 @@ namespace SAPADDON.USERMODEL._FormattedSearches
             #region Document Lines
 
             [Query]
-            public static class MSS_FS_GET_OITM_LIST { }
+            public static class MSS_FS_GET_MATRIX1_OITM_LIST { }
 
             [Query]
-            public static class MSS_FS_GET_OITM_ITEMCODE { }
+            public static class MSS_FS_GET_MATRIX1_ITEMCODE { }
 
             [Query]
-            public static class MSS_FS_GET_OITM_ITEMNAME { }
+            public static class MSS_FS_GET_MATRIX1_ITEMNAME { }
 
             [Query]
-            public static class MSS_FS_GET_OITM_VALORADQUISICION { }
+            public static class MSS_FS_GET_MATRIX1_VALORADQUISICION { }
+
+            #endregion
+
+            #region Adendas
+
+            [Query]
+            public static class MSS_FS_GET_MATRIX2_OITM_LIST { }
+
+            [Query]
+            public static class MSS_FS_GET_MATRIX2_ITEMCODE { }
+
+            [Query]
+            public static class MSS_FS_GET_MATRIX2_ITEMNAME { }
+
+            [Query]
+            public static class MSS_FS_GET_MATRIX2_VALORADQUISICION { }
 
             #endregion
 
@@ -133,6 +149,17 @@ namespace SAPADDON.USERMODEL._FormattedSearches
         /// PARAM1: MSS_CONT.Series, PARAM2: MSS_CONT.DocNum
         /// </summary>
         public static class MSS_QS_GET_RELATED_DELIVERY { }
+
+        /// <summary>
+        /// Devuelve la lista de ítems activos que pueden devolverse en un contrato
+        /// </summary>
+        public static class MSS_QS_GET_LISTARETORNO { }
+
+        /// <summary>
+        /// Devuelve un ítem del UDO Historial de Activos Fijos. PARAM1: ItemCode(U_MSS_ITCO)
+        /// </summary>
+        public static class MSS_QS_GET_MSS_AFHH_UDO_BY_ITEMCODE { }
+
         #endregion
     }
 }

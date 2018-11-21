@@ -25,7 +25,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.HELPER
         {
             public const string U_MSSL_TOP = "99";
             public const string Indicator = "09";
-            public const string TaxCode = "IGV";
+            public const string TaxCode = "IGV_18";//TODO:ESPECIFICAR EN LA FACTURA?
             public static class Lines
             {
                 public const string U_MSSL_CGP = "000";

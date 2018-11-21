@@ -84,6 +84,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL
         public bool ForceRefreshing { get; set; }
         public string ParentFieldOnChange { get; set; }
         public bool IsChildTable { get; set; }
+        public string MatrixId { get; set; }
     }
 
     public class MenuEntity

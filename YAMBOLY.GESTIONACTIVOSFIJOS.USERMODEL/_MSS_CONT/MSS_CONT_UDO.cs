@@ -3,9 +3,9 @@
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
 {
     [DBStructure]
-    [SAPUDO(Name = "Contrato de concesión de activos fijos",
+    [SAPUDO(Name = "AF- Contratos",
           HeaderTableType = typeof(MSS_CONT),
-          ChildTableTypeList = new[] { typeof(MSS_CONT_LINES) },
+          ChildTableTypeList = new[] { typeof(MSS_CONT_LINES), typeof(MSS_CONT_ADENDAS) },
           ObjectType = SAPbobsCOM.BoUDOObjType.boud_Document,
           ManageSeries = BoYesNoEnum.tYES
     )]

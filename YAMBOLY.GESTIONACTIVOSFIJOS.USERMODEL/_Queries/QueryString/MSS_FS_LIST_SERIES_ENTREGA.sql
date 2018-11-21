@@ -1,1 +1,1 @@
-﻿SELECT "AcctCode", "AcctCode" || ' - ' || "AcctName" FROM "OACT"
+﻿SELECT "Series","SeriesName" FROM "NNM1"

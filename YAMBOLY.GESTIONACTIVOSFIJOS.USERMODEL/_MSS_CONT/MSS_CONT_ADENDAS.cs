@@ -2,21 +2,27 @@
 
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
 {
-    [SAPTable(TableType = SAPbobsCOM.BoUTBTableType.bott_DocumentLines, TableDescription = "AF- Contratos.Lines", MatrixIdInForm = "MATRIX1")]
-    public class MSS_CONT_LINES
+    [SAPTable(TableType = SAPbobsCOM.BoUTBTableType.bott_DocumentLines, TableDescription ="AF- Contratos.Adendas" , MatrixIdInForm ="MATRIX2")]
+    public class MSS_CONT_ADENDAS
     {
-        [SAPField(FieldDescription = "Código inventario AF", FormattedSearchType = typeof(ACCTIVOSFIJOS4.MSS_FS_GET_MATRIX1_OITM_LIST))]
+        [SAPField(FieldType = SAPbobsCOM.BoFieldTypes.db_Date, FieldDescription = "Fecha adenda")]
+        public string U_MSS_DATE { get; set; }
+
+        [SAPField(FieldDescription = "Código adenda")]
+        public string U_MSS_CODE { get; set; }
+
+        [SAPField(FieldDescription = "Código inventario AF", FormattedSearchType = typeof(ACCTIVOSFIJOS4.MSS_FS_GET_MATRIX2_OITM_LIST))]
         public string U_MSS_AFCI { get; set; }
 
-        [SAPField(FieldDescription = "Código  AF", FormattedSearchType = typeof(ACCTIVOSFIJOS4.MSS_FS_GET_MATRIX1_ITEMCODE), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_AFCI))]
+        [SAPField(FieldDescription = "Código  AF", FormattedSearchType = typeof(ACCTIVOSFIJOS4.MSS_FS_GET_MATRIX2_ITEMCODE), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_AFCI))]
         public string U_MSS_AFCO { get; set; }
 
-        [SAPField(FieldDescription = "Descripción AF", FormattedSearchType = typeof(ACCTIVOSFIJOS4.MSS_FS_GET_MATRIX1_ITEMNAME), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_AFCI))]
+        [SAPField(FieldDescription = "Descripción AF", FormattedSearchType = typeof(ACCTIVOSFIJOS4.MSS_FS_GET_MATRIX2_ITEMNAME), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_AFCI))]
         public string U_MSS_AFDE { get; set; }
 
-        [SAPField(FieldDescription = "Valor adquisición", FormattedSearchType = typeof(ACCTIVOSFIJOS4.MSS_FS_GET_MATRIX1_VALORADQUISICION), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_AFCI))]
+        [SAPField(FieldDescription = "Valor adquisición", FormattedSearchType = typeof(ACCTIVOSFIJOS4.MSS_FS_GET_MATRIX2_VALORADQUISICION), ForceRefresh = true, ParentFieldOnChange = nameof(U_MSS_AFCI))]
         public string U_MSS_AFVA { get; set; }
-                
+
         [SAPField(FieldDescription = "Anexo",
               ValidValues = new[] { ANEXO.ANEXO4A.KEY, ANEXO.ANEXO4B.KEY },
               ValidDescription = new[] { ANEXO.ANEXO4B.VALUE, ANEXO.ANEXO4B.VALUE })]
@@ -42,5 +48,6 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
         }
 
         #endregion 
+
     }
 }
