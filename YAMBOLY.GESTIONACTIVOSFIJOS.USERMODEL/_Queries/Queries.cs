@@ -131,6 +131,10 @@ namespace SAPADDON.USERMODEL._FormattedSearches
         /// </summary>
         public static class MSS_QS_GET_CONTRATO_LINES { }
 
+
+        /// <summary>
+        /// Actualiza el estado del activo fijo. PARAM1: ITEMCODE, PARAM2: NEWSTATE
+        /// </summary>
         public static class MSS_QS_UPDATE_OITM_STATE { }
 
         /// <summary>
@@ -151,7 +155,7 @@ namespace SAPADDON.USERMODEL._FormattedSearches
         public static class MSS_QS_GET_RELATED_DELIVERY { }
 
         /// <summary>
-        /// Devuelve la lista de ítems activos que pueden devolverse en un contrato
+        /// Devuelve la lista de ítems activos que pueden devolverse en un contrato. PARAM1: DocEntry, PARAM2: Valor válido para estado retornado 
         /// </summary>
         public static class MSS_QS_GET_LISTARETORNO { }
 
@@ -159,6 +163,12 @@ namespace SAPADDON.USERMODEL._FormattedSearches
         /// Devuelve un ítem del UDO Historial de Activos Fijos. PARAM1: ItemCode(U_MSS_ITCO)
         /// </summary>
         public static class MSS_QS_GET_MSS_AFHH_UDO_BY_ITEMCODE { }
+
+
+        /// <summary>
+        /// Actualiza el estado un ítem  del contrato. PARAM1: ItemCode, PARAM2: Nuevo estado, PARAM3: DocEntry de contrato
+        /// </summary>
+        public static class MSS_QS_UPDATE_CONTLINES_STATE { }
 
         #endregion
     }

@@ -23,22 +23,23 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
         public string U_MSS_ANEX { get; set; }
 
         [SAPField(FieldDescription = "Estado",
-              ValidValues = new[] { ESTADO.ENCONCESION.KEY, ESTADO.RETORNADO.VALUE },
-              ValidDescription = new[] { ESTADO.RETORNADO.VALUE, ESTADO.RETORNADO.VALUE })]
+              ValidValues = new[] { ESTADO.ENCONCESION.KEY, ESTADO.RETORNADO.KEY },
+              ValidDescription = new[] { ESTADO.ENCONCESION.VALUE, ESTADO.RETORNADO.VALUE })]
         public string U_MSS_ESTD { get; set; }
 
         #region Valores válidos
 
         public static class ANEXO
         {
-            public static class ANEXO4A { public const string KEY = "1"; public const string VALUE = "Anexo 4A"; }
-            public static class ANEXO4B { public const string KEY = "2"; public const string VALUE = "Anexo 4B"; }
+            public static class ANEXO4A { public const string KEY = "ANEXO4A"; public const string VALUE = "Anexo 4A"; }
+            public static class ANEXO4B { public const string KEY = "ANEXO4B"; public const string VALUE = "Anexo 4B"; }
         }
 
         public static class ESTADO
         {
-            public static class ENCONCESION { public const string KEY = "1"; public const string VALUE = "En concesión"; }
-            public static class RETORNADO { public const string KEY = "2"; public const string VALUE = "Retornado"; }
+            public static class RESERVADO { public const string KEY = "RESERVADO"; public const string VALUE = "Reservado"; }
+            public static class ENCONCESION { public const string KEY = "ENCONCESION"; public const string VALUE = "En concesión"; }
+            public static class RETORNADO { public const string KEY = "RETORNADO"; public const string VALUE = "Retornado"; }
         }
 
         #endregion 

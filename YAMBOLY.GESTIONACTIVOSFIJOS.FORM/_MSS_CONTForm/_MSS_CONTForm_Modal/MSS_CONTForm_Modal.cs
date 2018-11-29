@@ -25,12 +25,16 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 
         public MSS_CONTForm_Modal(Dictionary<string, ISAPForm> dictionary, MSS_CONTForm parentForm)
         {
-            _Form = SapFormHelper.CreateForm(GetApplication(), XMLHelper.GetResourceString(System.Reflection.Assembly.GetExecutingAssembly(), this.GetType().Name), FormType);
-            dictionary.Add(_Form.UniqueID, this);
-
             _ParentForm = parentForm;
 
             string docEntry = _ParentForm.GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value;
+            var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_LISTARETORNO)).Replace(PARAM1, docEntry).Replace(PARAM2, MSS_CONT_LINES.ESTADO.RETORNADO.KEY);
+            var rs = DoQuery(query);
+            if (rs.RecordCount <= 0)
+                throw new CustomException("No se encontraron ítems disponibles para retorno y/o todos los ítems se encuentran en estado retornado.");
+
+            _Form = SapFormHelper.CreateForm(GetApplication(), XMLHelper.GetResourceString(System.Reflection.Assembly.GetExecutingAssembly(), this.GetType().Name), FormType);
+            dictionary.Add(_Form.UniqueID, this);
             FillGrid(docEntry);
         }
 
@@ -55,11 +59,6 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
                 ((SAPbouiCOM.ComboBoxColumn)grid.Columns.Item(1)).ValidValues.Add("2", OITM.ValidValues.MSS_EAAF.EnMantenimiento.DESCRIPTION);//TODO: REMOVE HARDCODE
 
                 ((SAPbouiCOM.ComboBoxColumn)grid.Columns.Item(1)).DisplayType = BoComboDisplayType.cdt_Description;
-            }
-            else
-            {
-                _Form.Items.Item("3").Specific.Caption = "No se encontraron ítems.";
-                _Form.Items.Item("3").Enabled = false;
             }
         }
 

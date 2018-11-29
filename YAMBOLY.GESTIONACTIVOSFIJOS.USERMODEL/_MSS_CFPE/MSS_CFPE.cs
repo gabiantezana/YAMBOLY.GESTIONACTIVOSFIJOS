@@ -32,8 +32,5 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CFPE
 
         [SAPField(FieldDescription = "Permiso estado retorno AF", ValidValues = new[] { "Y", "N" }, ValidDescription = new[] { "Si", "No" }, DefaultValue = "N")]
         public string U_MSS_PERT { get; set; }
-
-
-        
     }
 }

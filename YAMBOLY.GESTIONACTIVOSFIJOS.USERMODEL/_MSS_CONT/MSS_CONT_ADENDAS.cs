@@ -37,14 +37,14 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
 
         public static class ANEXO
         {
-            public static class ANEXO4A { public const string KEY = "1"; public const string VALUE = "Anexo 4A"; }
-            public static class ANEXO4B { public const string KEY = "2"; public const string VALUE = "Anexo 4B"; }
+            public static class ANEXO4A { public const string KEY = "ANEXO4A"; public const string VALUE = "Anexo 4A"; }
+            public static class ANEXO4B { public const string KEY = "ANEXO4B"; public const string VALUE = "Anexo 4B"; }
         }
 
         public static class ESTADO
         {
-            public static class ENCONCESION { public const string KEY = "1"; public const string VALUE = "En concesión"; }
-            public static class RETORNADO { public const string KEY = "2"; public const string VALUE = "Retornado"; }
+            public static class ENCONCESION { public const string KEY = "ENCONCESION"; public const string VALUE = "En concesión"; }
+            public static class RETORNADO { public const string KEY = "RETORNADO"; public const string VALUE = "Retornado"; }
         }
 
         #endregion 

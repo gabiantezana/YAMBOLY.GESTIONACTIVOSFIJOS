@@ -11,9 +11,9 @@ namespace SAPADDON.USERMODEL._DLN1
     public class DLN1
     {
         [SAPField(IsSystemField = true)]
-        public static string U_MSSL_CGP { get; set; }
+        public string U_MSSL_CGP { get; set; }
 
         [SAPField(IsSystemField = true)]
-        public static string U_MSSL_CGD { get; set; }
+        public string U_MSSL_CGD { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_AFHH
 {
-    [SAPTable(TableType = SAPbobsCOM.BoUTBTableType.bott_DocumentLines, TableDescription ="AF- HistorialUbicaciones.Lines")]
+    [SAPTable(TableType = SAPbobsCOM.BoUTBTableType.bott_DocumentLines, TableDescription = "AF- HistorialUbicaciones.Lines")]
     public class MSS_AFHH_LINES
     {
         [SAPField(IsSystemField = true)]
@@ -26,7 +26,7 @@
         [SAPField(FieldDescription = "Detalle de ubicacion")]
         public string U_MSS_DEUB { get; set; }
 
-        [SAPField(FieldDescription = "Fecha")]
+        [SAPField(FieldDescription = "Fecha", FieldType = SAPbobsCOM.BoFieldTypes.db_Date)]
         public string U_MSS_FECH { get; set; }
 
         [SAPField(FieldDescription = "Tipo de documento")]
@@ -47,8 +47,8 @@
         #region Valores válidos
         public static class TIPOUBICACION
         {
-            public static class PROPIA { public const string ID = "01"; public const string DESCRIPCION = "Propia"; }
-            public static class CLIENTE { public const string ID = "02"; public const string DESCRIPCION = "Cliente"; }
+            public static class PROPIA { public const string ID = "PROPIA"; public const string DESCRIPCION = "Propia"; }
+            public static class CLIENTE { public const string ID = "CLIENTE"; public const string DESCRIPCION = "Cliente"; }
         }
 
         #endregion

@@ -123,9 +123,6 @@
     <EmbeddedResource Include="_Queries\QueryString\MSS_FS_LIST_SERIES_ENTREGA.sql" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="_Queries\QueryString\.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="_Queries\QueryString\MSS_FS_GET_BP_CARDNAME.sql" />
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +202,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="_Queries\QueryString\MSS_QS_GET_MSS_AFHH_UDO_BY_ITEMCODE.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="_Queries\QueryString\MSS_QS_UPDATE_CONTLINES_STATE.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

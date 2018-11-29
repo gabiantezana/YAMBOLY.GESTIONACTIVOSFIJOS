@@ -5,3 +5,4 @@
 ,"U_MSS_AFDE" 	as "Descripción AF"
 FROM "@MSS_CONT_LINES" 
 WHERE "DocEntry" = 'PARAM1'
+AND "U_MSS_ESTD" != 'PARAM2' 
