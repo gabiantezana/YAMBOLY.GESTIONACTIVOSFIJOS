@@ -18,6 +18,9 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
         [SAPField(IsSystemField = true)]
         public string Series { get; set; }
 
+        [SAPField(FieldDescription ="Código")]
+        public string U_MSS_CODE { get; set; }
+        
         #region Datos generales
 
         [SAPField(FieldDescription = "Tipo contrato",

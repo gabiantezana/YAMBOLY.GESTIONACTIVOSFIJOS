@@ -16,6 +16,7 @@ using SAPbobsCOM;
 using System.Linq;
 using SAPADDON.HELPER;
 using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_AFHH;
+using YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT_HIST;
 
 namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
 {
@@ -26,16 +27,19 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
         #endregion 
 
         public const string FormType = nameof(MSS_CONT);
+        private LoadType _LoadType { get; set; }
+        private string _CodigoAdenda { get; set; }
         private Form _Form { get; set; }
 
         public MSS_CONTForm()
         {
+            _LoadType = LoadType.Contrato;
             _Form = SapFormHelper.CreateForm(GetApplication(), XMLHelper.GetResourceString(System.Reflection.Assembly.GetExecutingAssembly(), this.GetType().Name), FormType);
             GetFormOpenList().Add(_Form.UniqueID, this);
             CreateMenuAndButtons();
 
             LoadSeries();
-            SetForm();
+            LoadForm();
             _Form.EnableFormatSearch();
             _Form.Items.Item("MATRIX2").Enabled = false;
         }
@@ -87,28 +91,62 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             #endregion
         }
 
-        private void DisableAllItemsInForm()
+        private void SetEnableAllItemsInForm(bool enable)
         {
-            string[] itemsUIDEnabled = { };
+            string[] itemsNeverChange = { nameof(MSS_CONT.DocNum), nameof(MSS_CONT.DocEntry), nameof(MSS_CONT.Series), "1", "2" };
+
             for (var i = 0; i < _Form.Items.Count; i++)
             {
                 var item = _Form.Items.Item(i);
-                if (item.Type == BoFormItemTypes.it_EDIT || item.Type == BoFormItemTypes.it_COMBO_BOX)
-                    item.Enabled = false;
+                if (item.Type == BoFormItemTypes.it_EDIT
+                    || item.Type == BoFormItemTypes.it_COMBO_BOX
+                    || item.Type == BoFormItemTypes.it_MATRIX
+                    || item.Type == BoFormItemTypes.it_EXTEDIT
+                    && !itemsNeverChange.Contains(item.UniqueID))
+                    item.Enabled = enable;
             }
         }
 
-        private void SetForm()
+        private void EnableAdendaItemsInForm(bool visible)
         {
-            _Form.Items.Item("3").Visible = false;
+            //Campos no mapeados en el formulario pero se emplean para guardar en el UDO de historial cuando el formulario está en tipo Adenda
+            var adendaInfoItems = new string[] { nameof(MSS_CONT_HIST.U_MSS_ADEN), LABEL_CODIGOADENDA, nameof(MSS_CONT_HIST.U_MSS_FECH), LABEL_FECHAADENDA, nameof(MSS_CONT_HIST.U_MSS_COME), LABEL_COMENTARIOSADENDA };
+            adendaInfoItems.ToList().ForEach(x => _Form.Items.Item(x).Visible = visible);
+            adendaInfoItems.ToList().ForEach(x => _Form.Items.Item(x).Enabled = visible);
+
+            /*
+            _Form.Items.Item(BUTTON_CREARADENDA_UID).Visible = !visible;
+            _Form.Items.Item(BUTTON_CESION_UID).Visible = !visible;
+            _Form.Items.Item(BUTTON_RETORNO_UID).Visible = !visible;*/
+        }
+
+        private void LoadForm()
+        {
+            //-----------DESHABILITA TODOS LOS BOTONES CON LÓGICA DE VISIBILIDAD POR ESTADO Y TIPO------------------
+            _Form.Items.Item(BUTTON_CESION_UID).Visible = false;
+            _Form.Items.Item(BUTTON_RETORNO_UID).Visible = false;
+            _Form.Items.Item(BUTTON_CREARADENDA_UID).Visible = false;
+
             _Form.EnableMenu(MENU_IMPRIMIR, false);
             _Form.EnableMenu(MENU_LEGALIZAR, false);
             _Form.EnableMenu(MENU_RECHAZAR, false);
 
+            SetEnableAllItemsInForm(true);
+            EnableAdendaItemsInForm(false);
+
+            if (_Form.Title.Contains(TITLE_GENERAR_ADENDA))
+                _Form.Title = _Form.Title.Replace(TITLE_GENERAR_ADENDA, string.Empty);
+            //-----------------------------------------------------------------------------------------------------
+
             bool isUpdate = !string.IsNullOrEmpty(GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value.ToString());
             if (isUpdate)
             {
-                switch ((GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Value)
+                //Deshabilita el combo de series
+                _Form.Items.Item(nameof(MSS_CONT.Series)).Enabled = false;
+                _Form.Items.Item(nameof(MSS_CONT.U_MSS_TICO)).Enabled = false;
+
+                string currentState = (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Value.Trim();
+                switch (currentState)
                 {
                     case MSS_CONT.ESTADO.PENDIENTE.KEY:
                         _Form.EnableMenu(MENU_IMPRIMIR, true);
@@ -119,25 +157,29 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
                         _Form.EnableMenu(MENU_LEGALIZAR, true);
                         _Form.EnableMenu(MENU_RECHAZAR, true);
                         break;
+
                     case MSS_CONT.ESTADO.RECHAZADO.KEY:
-                        DisableAllItemsInForm();
+                        SetEnableAllItemsInForm(false);
                         break;
+
                     case MSS_CONT.ESTADO.LEGALIZADO.KEY:
-                        DisableAllItemsInForm();
+                        SetEnableAllItemsInForm(false);
                         //---------------------- Lógica para habilitar botón de Concesión------------------------ 
                         var query = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_RELATED_DELIVERY));
                         var series = (GetItemEspecific(nameof(MSS_CONT.Series)) as ComboBox)?.Value;
                         var docNum = (GetItemEspecific(nameof(MSS_CONT.DocNum)) as EditText)?.Value;
                         query = query.Replace(PARAM1, series)
                                     .Replace(PARAM2, docNum);
-
+                        /*
                         if (DoQuery(query).RecordCount > 0)//Tiene una o más entregas asociadas
-                            (_Form.Items.Item("3").Specific as Button).Caption = BUTTON_RETORNAR_CAPTION;
+                            (_Form.Items.Item(BUTTON_RETORNO_UID).Specific as Button).Caption = BUTTON_RETORNAR_CAPTION;
 
                         else//No tiene ninguna entrega asociada
-                            (_Form.Items.Item("3").Specific as Button).Caption = BUTTON_CONCESION_CAPTION;
+                            (_Form.Items.Item(BUTTON_CESION_RETORNO_UID).Specific as Button).Caption = BUTTON_CONCESION_CAPTION;*/
 
-                        _Form.Items.Item("3").Visible = true;
+                        _Form.Items.Item(BUTTON_CESION_UID).Visible = true;
+                        _Form.Items.Item(BUTTON_RETORNO_UID).Visible = true;
+                        _Form.Items.Item(BUTTON_CREARADENDA_UID).Visible = true;
                         break;
                     //------------------------------------------------------------------------------------------- 
                     default:
@@ -146,14 +188,24 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             }
             else
             {
-                //--------------------------SET ESTADO AS PENDIENTE---------------------------------------
+                //-----------------------------ESTADO POR DEFECTO AL CREAR CONTRATO: PENDIENTE---------------------------
                 (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Item.Enabled = true;
                 (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Select(MSS_CONT.ESTADO.PENDIENTE.KEY);
                 (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Active = false;
                 (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Item.Enabled = false;
             }
 
-            _Form.Items.Item("3").Enabled = isUpdate;
+            if (_LoadType == LoadType.Adenda)
+            {
+                _Form.Title += TITLE_GENERAR_ADENDA;
+
+                EnableAdendaItemsInForm(true);
+                //Las adendas solo pueden agregar o quitar ítems del contrato:
+                _Form.Items.Item("MATRIX1").Enabled = true;
+                _Form.Items.Item(BUTTON_CREARADENDA_UID).Visible = false;
+                _Form.Items.Item(BUTTON_CESION_UID).Visible = false;
+                _Form.Items.Item(BUTTON_RETORNO_UID).Visible = false;
+            }
         }
 
         private void LoadSeries()
@@ -210,11 +262,11 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             DoQuery(query);
         }
 
-        private void UpdateItemsState()
+        private void UpdateItemsStateAndFixedAssets()
         {
             string docEntry = (GetItemEspecific(nameof(MSS_CONT.DocEntry)) as EditText).Value;
             bool isUpdate = !string.IsNullOrEmpty(docEntry);
-            //Recorre DataSource para identificar ítems eliminados
+            //-----------------------------------Recorre DataSource para identificar ítems eliminados-----------------------------------
             foreach (var item in GetItemsFromContrato(docEntry))
             {
                 string itemCodeInMatrix = null;
@@ -230,6 +282,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
                 if (string.IsNullOrEmpty(itemCodeInMatrix))//No se encontró en la matriz, por lo tanto fue eliminado
                     UpdateActivoFijoState(item.ItemCode, OITM.ValidValues.MSS_EAAF.Disponible.ID);
             }
+            //------------------------------------------------------------------------------------------------------------------------------
 
             //Recorre matriz
             string itemCode, itemState;
@@ -238,12 +291,16 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
                 itemCode = GetMatrix().Columns.Item(nameof(MSS_CONT_LINES.U_MSS_AFCO)).Cells.Item(j).Specific.Value;
                 itemState = GetMatrix().Columns.Item(nameof(MSS_CONT_LINES.U_MSS_ESTD)).Cells.Item(j).Specific.Value;
 
-                if (string.IsNullOrEmpty(itemState))//Si es una nueva línea agregada, el estado por defecto es: Reservado
+                if (string.IsNullOrEmpty(itemState))//Si es una nueva línea agregada, SETEA CAMPOS POR DEFECTO
                 {
                     GetMatrix().Columns.Item(nameof(MSS_CONT_LINES.U_MSS_ESTD)).Cells.Item(j).Specific.Value = MSS_CONT_LINES.ESTADO.RESERVADO.KEY;
+                    GetMatrix().Columns.Item(nameof(MSS_CONT_LINES.U_MSS_TIPO)).Cells.Item(j).Specific.Value = MSS_CONT_LINES.TIPOREGISTRO.CONTRATOINICIAL.KEY;
+                    if (_LoadType == LoadType.Adenda)
+                        GetMatrix().Columns.Item(nameof(MSS_CONT_LINES.U_MSS_TIPO)).Cells.Item(j).Specific.Value = MSS_CONT_LINES.TIPOREGISTRO.ADENDA.KEY;
+
+                    //TODO: HANDLE TRANSACTION
                     UpdateActivoFijoState(itemCode, OITM.ValidValues.MSS_EAAF.Reservado.ID);//Actualiza estado en maestro de AF.
                 }
-
             }
         }
 
@@ -268,7 +325,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             var list = new List<FixedAsset>();
             while (!rsLines.EoF)
             {
-                list.Add(new FixedAsset() { ItemCode = rsLines.Fields.Item(nameof(MSS_CONT_LINES.U_MSS_AFCO)).Value, State = OITM.ValidValues.MSS_EAAF.Asignado.ID });
+                list.Add(new FixedAsset() { ItemCode = rsLines.Fields.Item(nameof(MSS_CONT_LINES.U_MSS_AFCO)).Value, State = rsLines.Fields.Item(nameof(MSS_CONT_LINES.U_MSS_ESTD)).Value });
                 rsLines.MoveNext();
             }
             return list;
@@ -336,6 +393,15 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             DoQuery(query);
         }
 
+        private void OnCrearAdendaClick()
+        {
+            var message = "Las siguientes modificaciones que se realicen al contrato generarán una adenda. ¿Desea continuar?";
+            if (GetApplication().MessageBox(message, 1, "Sí", "No") == 1)
+            {
+                _LoadType = LoadType.Adenda;
+                LoadForm();
+            }
+        }
         #endregion
 
         #region Events
@@ -348,20 +414,15 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             else if (itemEvent.ItemUID == "1" && itemEvent.BeforeAction)
                 return CreateUpdate();
 
-            else if (itemEvent.ItemUID == "3" && itemEvent.ActionSuccess)
-            {
-                switch (GetItemEspecific("3").Caption)
-                {
-                    case BUTTON_CONCESION_CAPTION:
-                        CrearConcesion();
-                        break;
-                    case BUTTON_RETORNAR_CAPTION:
-                        ShowModal();
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
+            else if (itemEvent.ItemUID == BUTTON_CREARADENDA_UID && itemEvent.ActionSuccess)
+                OnCrearAdendaClick();
+
+            else if (itemEvent.ItemUID == BUTTON_CESION_UID && itemEvent.ActionSuccess)
+                CrearConcesion();
+
+            else if (itemEvent.ItemUID == BUTTON_RETORNO_UID && itemEvent.ActionSuccess)
+                ShowModal();
+
             return true;
         }
         public bool HandleItemPressed(ItemEvent oEvent) { return true; }
@@ -375,9 +436,11 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
                 case BoEventTypes.et_FORM_LOAD://TODO:
                 case BoEventTypes.et_FORM_DATA_LOAD:
                 case BoEventTypes.et_DATASOURCE_LOAD:
-                case BoEventTypes.et_MATRIX_LOAD:
                     if (oBusinessObjectInfo.ActionSuccess)
-                        SetForm();
+                    {
+                        _LoadType = LoadType.Contrato;
+                        LoadForm();
+                    }
                     break;
             }
             return true;
@@ -389,7 +452,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             switch (menuEvent.MenuUID)
             {
                 case MenuUID.MenuCrear:
-                    SetForm();
+                    LoadForm();
                     break;
                 case MENU_IMPRIMIR:
                     Imprimir();
@@ -491,6 +554,11 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
         {
             var isUpdate = !string.IsNullOrEmpty(GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value.ToString());
             //-----------------------------------------VALIDA ALMACÉN-----------------------------------------
+            if (!IsUpdate)
+            {
+
+            }
+
             var almacen = (GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)) as EditText).Value;
             if (string.IsNullOrEmpty(almacen))
                 throw new Exception("Seleccione el almacén");
@@ -509,22 +577,38 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             //----------------------------Valida que el documento se pueda modificar--------------------------------
             if (isUpdate)
             {
-                string currentState = (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Value.Trim();
-                switch (currentState)
+                if (_LoadType == LoadType.Contrato)
                 {
-                    case MSS_CONT.ESTADO.PENDIENTE.KEY:
-                    case null:
-                    case "":
-                        break;
-                    case MSS_CONT.ESTADO.IMPRESO.KEY:
-                    case MSS_CONT.ESTADO.RECHAZADO.KEY:
-                    case MSS_CONT.ESTADO.LEGALIZADO.KEY:
-                    default:
-                        throw new Exception("El documento no puede ser modificado con el estado actual.");
+                    string currentState = (GetItemEspecific(nameof(MSS_CONT.U_MSS_ESTA)) as ComboBox).Value.Trim();
+                    switch (currentState)
+                    {
+                        case MSS_CONT.ESTADO.PENDIENTE.KEY:
+                        case null:
+                        case "":
+                            break;
+                        case MSS_CONT.ESTADO.IMPRESO.KEY:
+                        case MSS_CONT.ESTADO.RECHAZADO.KEY:
+                        case MSS_CONT.ESTADO.LEGALIZADO.KEY:
+                        default:
+                            throw new Exception("El documento no puede ser modificado con el estado actual.");
+                    }
+                }
+                else if (_LoadType == LoadType.Adenda)
+                {
+                    if (string.IsNullOrEmpty(GetItemEspecific(nameof(MSS_CONT_HIST.U_MSS_ADEN)).Value.Trim()))
+                        throw new Exception("Ingrese el código de adenda");
+
+                    if (string.IsNullOrEmpty(GetItemEspecific(nameof(MSS_CONT_HIST.U_MSS_FECH)).Value.Trim()))
+                        throw new Exception("Ingrese la fecha de adenda");
+
+                    var message = "Se generará una adenda a este contrato. Esta acción es irreversible. ¿Desea continuar?";
+                    if (GetApplication().MessageBox(message, 1, "Sí", "No") != 1)
+                        return false;
                 }
             }
+
             //---------------------------Actualiza estados de activos fijos y detalle de Contrato--------------------------
-            UpdateItemsState();
+            UpdateItemsStateAndFixedAssets();
 
             return true;
         }
@@ -545,31 +629,46 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             var contratoItems = GetItemsFromContrato(docEntry);
             contratoItems.ForEach(x => UpdateActivoFijoState(x.ItemCode, OITM.ValidValues.MSS_EAAF.Disponible.ID));
 
+            //Guarda en la tabla de modificaciones legales
+            //TODO:
             ShowMessage(MessageType.Success, "El documento se rechazó correctamente.");
         }
 
         private void Legalizar()
         {
             UpdateContState(GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value, MSS_CONT.ESTADO.LEGALIZADO.KEY);
+            //TODO: GUARDA HISTORIAL DE CONTRATO
             ShowMessage(MessageType.Success, "El documento se legalizó correctamente.");
         }
 
         private void CrearConcesion()
         {
             string docEntry = GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value;
-
-            var query_ = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_RELATED_DELIVERY)).Replace(PARAM1, (GetItemEspecific(nameof(MSS_CONT.Series)) as ComboBox).Value.ToString().Trim()).Replace(PARAM2, (GetItemEspecific(nameof(MSS_CONT.DocNum)) as EditText).Value.ToString().Trim());
-            if (DoQuery(query_).RecordCount > 0)
-                throw new Exception("Ya se generó una cesión temporal para este documento.");
-
             string message = "Se procederá a realizar la concesión temporal de los activos fijos. Esta acción no se puede revertir. Desea continuar?";
-            var contratoItems = GetItemsFromContrato(docEntry);
-            CrearDocumentos(message, BoObjectTypes.oDeliveryNotes, contratoItems);
 
-            contratoItems.ForEach(x => UpdateContLineState(x.ItemCode, MSS_CONT_LINES.ESTADO.ENCONCESION.KEY, docEntry));
-            contratoItems.ForEach(x => UpdateActivoFijoState(x.ItemCode, OITM.ValidValues.MSS_EAAF.Asignado.ID));
+            var pendingToConcesion = GetItemsFromContrato(docEntry).Where(x => x.State == MSS_CONT_LINES.ESTADO.RESERVADO.KEY).ToList();
+            if (pendingToConcesion.Count() == 0)
+                throw new CustomException("No existen ítems pendientes de concesión");
+            try
+            {
+                if (GetApplication().MessageBox(message, 1, "Sí", "No") == 1)
+                {
+                    GetCompany().StartTransaction();
 
-            ShowMessage(MessageType.Success, "Se realizó correctamente la concesión de activos fijos.");
+                    CrearDocumentos(BoObjectTypes.oDeliveryNotes, pendingToConcesion);
+                    pendingToConcesion.ForEach(x => UpdateContLineState(x.ItemCode, MSS_CONT_LINES.ESTADO.ENCONCESION.KEY, docEntry));
+                    pendingToConcesion.ForEach(x => UpdateActivoFijoState(x.ItemCode, OITM.ValidValues.MSS_EAAF.Asignado.ID));
+                    GetCompany().EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit);
+
+                    ShowMessage(MessageType.Success, "Se realizó correctamente la concesión de activos fijos.");
+                }
+            }
+            catch (Exception)
+            {
+                if (GetCompany().InTransaction)
+                    GetCompany().EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
+                throw;
+            }
         }
 
         public void CrearRetorno(List<FixedAsset> SelectedItems)
@@ -577,53 +676,49 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
             string docEntry = GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value;
             string message = "Se procederá a realizar el retorno de los activos fijos. Esta acción no se puede revertir. Desea continuar?";
 
-            CrearDocumentos(message, BoObjectTypes.oReturns, SelectedItems);
-
-            SelectedItems.ForEach(x => UpdateContLineState(x.ItemCode, MSS_CONT_LINES.ESTADO.RETORNADO.KEY, docEntry));
-            SelectedItems.ForEach(x => UpdateActivoFijoState(x.ItemCode, x.State));
-
-            ShowMessage(MessageType.Success, "Se realizó correctamente el retorno de activos fijos.");
-        }
-
-        private void CrearDocumentos(string message, BoObjectTypes boObjectType, List<FixedAsset> itemCodes)
-        {
-            if (GetApplication().MessageBox(message, 1, "Sí", "No") == 1)
+            try
             {
-                try
+                if (GetApplication().MessageBox(message, 1, "Sí", "No") == 1)
                 {
-                    //------------------------------------Obtiene cantidad de líneas máximas por documento------------------------------------------
-                    string almacen = GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value as string;
-                    if (string.IsNullOrEmpty(almacen))
-                        throw new Exception("Error al obtener el almacén");
-
-                    var queryString = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_MSS_CFSE)).Replace(PARAM1, almacen);
-                    int? maxLines = DoQuery(queryString).Fields.Item(nameof(MSS_CFSE.U_MSS_NULI)).Value as int?;
-
-                    var docEntry = GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value;
-                    string queryLines = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO_LINES)).Replace(PARAM1, docEntry.ToString());
-                    var rsLines = DoQuery(queryLines);
-                    //------------------------------------------------------------------------------------------------------------------------------
-
-                    //Inicia transacción
                     GetCompany().StartTransaction();
-                    //Crea documento(s) en SAP
-                    CreateDocument(boObjectType, itemCodes.Select(x => x.ItemCode).ToList(), maxLines);
-                    //Finaliza transacción
+
+                    CrearDocumentos(BoObjectTypes.oReturns, SelectedItems);
+                    SelectedItems.ForEach(x => UpdateContLineState(x.ItemCode, MSS_CONT_LINES.ESTADO.RETORNADO.KEY, docEntry));
+                    SelectedItems.ForEach(x => UpdateActivoFijoState(x.ItemCode, x.State));
                     GetCompany().EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit);
-                }
-                catch (Exception)
-                {
-                    if (GetCompany().InTransaction)
-                        GetCompany().EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
-                    throw;
+                    ShowMessage(MessageType.Success, "Se realizó correctamente el retorno de activos fijos.");
                 }
             }
+            catch (Exception)
+            {
+                if (GetCompany().InTransaction)
+                    GetCompany().EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
+                throw;
+            }
+        }
+
+        private void CrearDocumentos(BoObjectTypes boObjectType, List<FixedAsset> itemCodes)
+        {
+            //------------------------------------Obtiene cantidad de líneas máximas por documento------------------------------------------
+            string almacen = GetItemEspecific(nameof(MSS_CONT.U_MSS_ADES)).Value as string;
+            if (string.IsNullOrEmpty(almacen))
+                throw new Exception("Error al obtener el almacén");
+
+            var queryString = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_MSS_CFSE)).Replace(PARAM1, almacen);
+            int? maxLines = DoQuery(queryString).Fields.Item(nameof(MSS_CFSE.U_MSS_NULI)).Value as int?;
+
+            var docEntry = GetItemEspecific(nameof(MSS_CONT.DocEntry)).Value;
+            string queryLines = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO_LINES)).Replace(PARAM1, docEntry.ToString());
+            var rsLines = DoQuery(queryLines);
+            //------------------------------------------------------------------------------------------------------------------------------
+
+            //Crea documento(s) en SAP
+            CreateDocument(boObjectType, itemCodes.Select(x => x.ItemCode).ToList(), maxLines);
+
         }
 
         private void CreateDocument(BoObjectTypes boObjectType, List<string> itemCodeList, int? maxLinesPerDocument, int indexAEmpezar = 0)
         {
-
-
             var docEntry = (GetItemEspecific(nameof(MSS_CONT.DocEntry)) as EditText).Value;
             var queryContrato = FileHelper.GetResourceString(nameof(Queries.MSS_QS_GET_CONTRATO)).Replace(PARAM1, docEntry.ToString());
             var rsQueryContrato = DoQuery(queryContrato);
@@ -745,6 +840,12 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
                 generalService.Update(generalData);
         }
 
+        private void SaveAsAdenda()
+        {
+
+
+        }
+
         #endregion
 
         #region Constants
@@ -758,8 +859,8 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
         private const string MENU_RECHAZAR = "MENU_RECHAZAR";
         private const string MENU_RECHAZAR_CAPTION = "Rechazar";
 
-        private const string BUTTON_CONCESION_CAPTION = "Concesión";
-        private const string BUTTON_RETORNAR_CAPTION = "Retorno";
+        private const string BUTTON_CESION_UID = "BTNCESION";
+        private const string BUTTON_RETORNO_UID = "BTNRETORNO";
 
         private const string MENU_ADDLINE_MATRIX1 = "MENU_ADDLINE_MATRIX1";
         private const string MENU_ADDLINE_MATRIX1_CAPTION = "Agregar línea";
@@ -775,7 +876,20 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM._MSS_CONTForm
         private const string MENU_REMOVELINE_MATRIX2_CAPTION = "Eliminar línea";
 
         private const string ITEM_ADENDASTAB_UID = "ADENDASTAB";
+        //private const string ITEM_ADENDATAB_UID = "ADENDATAB";
+        private const string BUTTON_CREARADENDA_UID = "BTNADENDA";
 
+        private const string TITLE_GENERAR_ADENDA = " Creación de adenda";
+
+        private const string LABEL_CODIGOADENDA = "L_MSS_ADEN";
+        private const string LABEL_FECHAADENDA = "L_MSS_FECH";
+        private const string LABEL_COMENTARIOSADENDA = "L_MSS_COME";
         #endregion
+
+        private enum LoadType
+        {
+            Contrato = 1,
+            Adenda = 2,
+        }
     }
 }

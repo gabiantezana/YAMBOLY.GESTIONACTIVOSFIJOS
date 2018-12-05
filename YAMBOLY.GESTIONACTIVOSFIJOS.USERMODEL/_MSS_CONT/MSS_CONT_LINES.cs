@@ -27,7 +27,21 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.USERMODEL._MSS_CONT
               ValidDescription = new[] { ESTADO.ENCONCESION.VALUE, ESTADO.RETORNADO.VALUE })]
         public string U_MSS_ESTD { get; set; }
 
+        [SAPField(FieldDescription = "Código Adenda")]
+        public string U_MSS_ADEN { get; set; }
+
+        [SAPField(FieldDescription = "Tipo registro",
+            ValidValues = new[] { TIPOREGISTRO.CONTRATOINICIAL.KEY, TIPOREGISTRO.ADENDA.KEY },
+              ValidDescription = new[] { TIPOREGISTRO.CONTRATOINICIAL.VALUE, TIPOREGISTRO.ADENDA.VALUE })]
+        public string U_MSS_TIPO { get; set; }
+
         #region Valores válidos
+
+        public static class TIPOREGISTRO
+        {
+            public static class CONTRATOINICIAL { public const string KEY = "CONTRATOINICIAL"; public const string VALUE = "Contrato inicial"; }
+            public static class ADENDA { public const string KEY = "ADENDA"; public const string VALUE = "Adenda"; }
+        }
 
         public static class ANEXO
         {

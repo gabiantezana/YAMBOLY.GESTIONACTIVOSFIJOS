@@ -88,6 +88,9 @@
   <ItemGroup>
     <Compile Include="Helper\FileHelper.cs" />
     <Compile Include="_DLN1\DLN1.cs" />
+    <Compile Include="_MSS_CONT_HIST\MSS_CONT_HIST.cs" />
+    <Compile Include="_MSS_CONT_HIST\MSS_CONT_HIST_LINES.cs" />
+    <Compile Include="_MSS_CONT_HIST\MSS_CONT_HIST_UDO.cs" />
     <Compile Include="_MSS_CONT\MSS_CONT_ADENDAS.cs" />
     <Compile Include="_Queries\Queries.cs" />
     <Compile Include="_Menu\_Menu.cs" />
