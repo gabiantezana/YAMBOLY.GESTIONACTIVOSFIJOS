@@ -32,7 +32,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
 
                 ShowMessage(MessageType.Success, "Creando autorizaciones");
                 CreateAuthorizations();
-
+                    
                 SetApplicationEventFilters();
                 SetApplicationEvents();
                 ShowMessage(MessageType.Success, "El Addon se cargó exitosamente");
@@ -42,7 +42,7 @@ namespace YAMBOLY.GESTIONACTIVOSFIJOS.FORM
                 var _ex = HandleApplicationException(ex);
                 throw _ex as Exception;
             }
-        }
+        }   
 
         public void ConnectApplication()
         {
